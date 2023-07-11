@@ -4,6 +4,7 @@ import { FontAwesome5, FontAwesome, MaterialCommunityIcons, Ionicons} from "@exp
 
 const processSale = <FontAwesome5 name="hand-holding-usd" size={60} />
 const viewInventory = <MaterialCommunityIcons name="archive-search-outline" size={60} />
+const account = <MaterialCommunityIcons name="account-circle" size={50} />
 const newStock = <MaterialCommunityIcons name="archive-plus-outline" size={60} />
 const transferStock = <MaterialCommunityIcons name="archive-arrow-up-outline" size={63} />
 const removeStock = <FontAwesome name="trash-o" size={60} />
@@ -18,6 +19,15 @@ export default class DashboardScreen extends React.Component {
     render(){
         return (
             <View style={styles.Container}>
+                <View style={{display: "flex", flexDirection: "row"}}>
+                    <Pressable>
+                    {account}
+                    </Pressable>
+                    <View>
+                        <Text>Trinity Cacciola</Text>
+                        <Text>Phelandaba</Text>
+                    </View>
+                </View>
                 <View style={styles.main}>
                     <View style={styles.div}>
                         <Pressable onPress={() => this.props.navigation.navigate("ProcessSale")}>
@@ -25,7 +35,7 @@ export default class DashboardScreen extends React.Component {
                             <Text style={{textAlign: "center"}}>Process</Text>
                             <Text style={{textAlign: "center"}}>Sale</Text>
                         </Pressable>
-                        <Pressable >
+                        <Pressable onPress={() => this.props.navigation.navigate("InventoryTable")} >
                             {viewInventory}
                             <Text style={{textAlign: "center"}}>View</Text>
                             <Text style={{textAlign: "center"}}>Inventory</Text>
@@ -44,12 +54,12 @@ export default class DashboardScreen extends React.Component {
                         </Pressable>
                     </View>
                     <View style={styles.div}>
-                        <Pressable >
+                        <Pressable onPress={() => this.props.navigation.navigate("remove product")}>
                             {removeStock}
                             <Text style={{textAlign: "center"}}>Remove</Text>
                             <Text style={{textAlign: "center"}}>Stock</Text>
                         </Pressable>
-                        <Pressable >
+                        <Pressable onPress={() => this.props.navigation.navigate("reports")}>
                             {reports}
                             <Text style={{textAlign: "center", marginTop: 10}}>Reports</Text>
                         </Pressable>
@@ -65,8 +75,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#CF8DB9", 
         height: "100%",
         display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "center"
+        justifyContent: "flex-end"
     },
     main: {
         display: "flex",
@@ -76,7 +85,7 @@ const styles = StyleSheet.create({
         height: "78%",
         borderTopRightRadius: 50,
         borderTopLeftRadius: 50,
-        paddingTop: 40
+        paddingTop: 20
     },
     div: {
         display: "flex",

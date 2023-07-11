@@ -9,6 +9,7 @@ export default class LoginScreen extends React.Component {
             name: "",
             newPassword: "",
             confirmPassword: "",
+            branch: ""
         }
     }
 
@@ -42,6 +43,15 @@ export default class LoginScreen extends React.Component {
                           value={this.state.confirmPassword}
                           keyboardType={"visible-password"}
                           onChangeText={(confirmPassword) => this.setState({ confirmPassword })}
+                        />
+                        <TextInput
+                          style={styles.input}
+                          placeholder="Add branch name"
+                          placeholderTextColor={"black"}
+                          editable={true}
+                          value={this.state.branch}
+                          keyboardType={"visible-password"}
+                          onChangeText={(branch) => this.setState({ branch })}
                         />
                     </View>
                     <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.navigate("Dashboard")}}>
@@ -94,7 +104,7 @@ const styles = StyleSheet.create({
         height: "78%",
         borderTopRightRadius: 50,
         borderTopLeftRadius: 50,
-        paddingTop: 70
+        paddingTop: 50
     },
     input : {
         marginBottom: 40,

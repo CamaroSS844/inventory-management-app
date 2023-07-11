@@ -3,6 +3,14 @@
     "name": "fireApp",
     "slug": "fireApp",
     "version": "1.0.0",
+    "plugins": [
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
+        }
+      ]
+    ],
     "assetBundlePatterns": [
       "**/*"
     ]

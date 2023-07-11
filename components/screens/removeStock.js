@@ -1,45 +1,11 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { showMessage, hideMessage } from "react-native-flash-message";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
-const cancel = <MaterialIcons name="cancel" size={20} color={"white"}/>
-const check = <MaterialIcons name="check-circle" size={20} color={"white"}/>
 
 //inventory app
-
-export const checkFields = (obj, successFunc) => {
-  isComplete = true; 
-  Object.values(obj).forEach(function(val){
-    console.log(val);
-    if(val == ""){  
-      isComplete = false;
-    }
-  })
-   if(!isComplete){
-    showMessage({
-      message: "  Please complete all fields!",
-      type: "danger",
-      autoHide: true,
-      icon: () => cancel
-    });
-  }else {
-    successFunc();
-  }
-}
-
-const FieldsAreComplete = () => {
-
-    showMessage({
-      message: "   Saved!",
-      type: "success",
-      autoHide: true,
-      icon: () => check
-    });
-}
-
-export default class AddNewProduct extends React.Component {
+export default class RemoveProduct extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -47,7 +13,7 @@ export default class AddNewProduct extends React.Component {
             productName: "",
             quantity: "",
             minLevel: "",
-            pricePerUnit: ""
+            Reason: ""
         }
     }
 
@@ -62,7 +28,7 @@ export default class AddNewProduct extends React.Component {
                        <TextInput
                           style={styles.input}
                           placeholder="Enter product name"
-                          placeholderTextColor={"black"}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.productName}
                           keyboardType={"visible-password"}
@@ -71,7 +37,7 @@ export default class AddNewProduct extends React.Component {
                          <TextInput
                           style={styles.input}
                           placeholder="Enter barcode number"
-                          placeholderTextColor="black"
+                          placeholderTextColor="grey"
                           editable={true}
                           value={this.state.barcodeNumber}
                           onChangeText={(barcodeNumber) => this.setState({ barcodeNumber })}
@@ -80,7 +46,7 @@ export default class AddNewProduct extends React.Component {
                         <TextInput
                           style={styles.input}
                           placeholder="Enter quantity"
-                          placeholderTextColor={"black"}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.quantity}
                           keyboardType={"numeric"}
@@ -88,34 +54,19 @@ export default class AddNewProduct extends React.Component {
                         />
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter minimum level "
-                          placeholderTextColor={"black"}
+                          placeholder="Explain why it was removed "
+                          placeholderTextColor={"grey"}
                           editable={true}
-                          value={this.state.minLevel}
+                          value={this.state.Reason}
                           keyboardType={"numeric"}
-                          onChangeText={(minLevel) => this.setState({ minLevel })}
-                        />
-                        <TextInput
-                          style={styles.input}
-                          placeholder="Enter price per unit "
-                          placeholderTextColor={"black"}
-                          editable={true}
-                          value={this.state.pricePerUnit}
-                          keyboardType={"numeric"}
-                          onChangeText={(pricePerUnit) => this.setState({ pricePerUnit })}
+                          onChangeText={(Reason) => this.setState({ Reason })}
                         />
                     </View>
                     <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly"}}>
-                      <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}} onPress={() => this.setState({
-                        barcodeNumber: "",
-                        productName: "",
-                        quantity: "",
-                        minLevel: "",
-                        pricePerUnit: ""
-                      })}>
+                      <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}}>
                           <Text style={{color: "white"}}>Clear</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.button} onPress={() => checkFields(this.state, FieldsAreComplete)}>
+                      <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate("sign in")}>
                           <Text style={{color: "white"}}>Confirm</Text>
                       </TouchableOpacity>
                     </View>
@@ -159,5 +110,15 @@ const styles = StyleSheet.create({
       height: 35,
       borderRadius: 15
 
+  },
+  item: {
+      color: "white"
+  },
+  para: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      paddingTop: 20
   }
 })
+

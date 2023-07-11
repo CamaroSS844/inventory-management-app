@@ -1,4 +1,5 @@
-import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet, ScrollView } from "react-native";
+import { Table, TableWrapper, Row } from 'react-native-table-component';
 import React from "react"
 
 //inventory app
@@ -6,28 +7,62 @@ export default class Receipt extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            
+            tableHead: ['Name', 'Unit Price $', 'Quantity', 'Total $'],
+        widthArr: [170, 70, 70, 70]
         }
     }
 
     render(){
+        const state = this.state;
+        const tableData = [];
+        for (let i = 0; i < 10; i += 1) {
+          const rowData = [];
+          for (let j = 0; j < 4; j += 1) {
+            rowData.push(`${i}${j}`);
+          }
+          tableData.push(rowData);
+        }
+
         return (
             <View style={styles.Container}>
                 <View style={styles.main}>
-                    <View>
-                        <Text>receipt here and there</Text>
+                    <View style={styles.container}>
+                        <ScrollView horizontal={true}>
+                          <View>
+                            <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+                              <Row data={state.tableHead} widthArr={state.widthArr} style={styles.header} textStyle={styles.text}/>
+                            </Table>
+                            <ScrollView style={styles.dataWrapper}>
+                              <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
+                                {
+                                  tableData.map((rowData, index) => (
+                                    <TouchableOpacity>
+                                        <Row
+                                          key={index}
+                                          data={rowData}
+                                          widthArr={state.widthArr}
+                                          style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
+                                          textStyle={styles.text}
+                                        />
+                                    </TouchableOpacity>
+                                  ))
+                                }
+                              </Table>
+                            </ScrollView>
+                          </View>
+                        </ScrollView>
                     </View>
-                    <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.navigate("Dashboard")}}>
-                        <Text style={styles.item}>Register</Text>
+                    <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly"}}>
+                      <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}}>
+                          <Text style={{color: "white"}}>Clear</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.button}>
+                          <Text style={{color: "white"}}>Confirm</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity style={{...styles.button, marginTop: 20, marginBottom: 20}} onPress={() => this.props.navigation.navigate("ProcessSale")}>
+                          <Text style={{color: "white"}}>Add more</Text>
                     </TouchableOpacity>
-                    <View style={styles.para}>
-                        <Text>Already have an account  </Text>
-                        <Pressable onPress={() => {this.props.navigation.navigate("sign in")}}>
-                            <Text style={{color: "#476C6C", fontWeight: "bold", fontSize: 15}}>
-                                Sign in
-                            </Text>
-                        </Pressable>
-                    </View>
                 </View>
             </View>
         )
@@ -35,20 +70,6 @@ export default class Receipt extends React.Component {
 }
 
 
-
-//fireapp
-// import { View, Text, Button } from "react-native";
-// import React from "react"
-// export default List = (props) => {
-//     return (
-//         <View>
-//             <Text>List</Text>
-//             <Button onPress={() => props.navigation.navigate("my details")}
-//             title="open Details"
-//             />
-//         </View>
-//     )
-// }
 
 
 const styles = StyleSheet.create({
@@ -64,17 +85,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#D9D9D9",
         width: "100%",
-        height: "78%",
+        height: "90%",
         borderTopRightRadius: 50,
         borderTopLeftRadius: 50,
-        paddingTop: 70
-    },
-    input : {
-        marginBottom: 40,
-        backgroundColor: "white",
-        width: "70%",
-        padding: 10,
-        borderRadius: 20
+        paddingTop: 40
     },
     button: {
         backgroundColor: "#476C6C",
@@ -89,10 +103,9 @@ const styles = StyleSheet.create({
     item: {
         color: "white"
     },
-    para: {
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        paddingTop: 20
-    }
+    container: { flex: 1, padding: 16, paddingTop: 0, backgroundColor: "#D9D9D9" },
+    header: { height: 50, backgroundColor: '#537791' },
+    text: { textAlign: 'center', fontWeight: '100' },
+    dataWrapper: { marginTop: -1 },
+    row: { height: 40, backgroundColor: '#E7E6E1' }
 })
