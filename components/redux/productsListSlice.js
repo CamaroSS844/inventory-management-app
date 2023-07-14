@@ -2,47 +2,59 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 
+// "78909": {
+//   barcodeNumber: "123456",
+//   productName: "books",
+//   quantity: "100",
+//   minLevel: "20",
+//   pricePerUnit: "5"
+// }
+
+
 
 const initialState = {
-    value: []
+    value: {
+      "1234567890": {
+        barcodeNumber: "1234567890",
+        productName: "books",
+        quantity: "20",
+        minLevel: "5",
+        pricePerUnit: "1"
+      },
+    }
 }
- 
-export const favoritesSlice = createSlice({
-    name: 'fList',
+
+export const productsSlice = createSlice({
+    name: 'inventoryList',
     initialState,
     reducers: {
-        initializeList: (state = [], action) => {
-          state.value = action.payload
+        getItem: (state = {}, action) => {
+          console.log(state);
+          value = checkState(state, action);
+          if ( !value ) return value;
+          return state.value[action.payload]
         }
         ,
-        toggleFavorites: (state = [], action) => {
-              state.value = ToggleFavorites(state, action.payload);
+        addNewProducts: (state = {}, action) => {
+            state.value = addToInventory(state.value, action.payload);
           },
+        remove: (state= {}, action) => {
+          barcode = action.payload
+          delete state.value.barcode;
+        },
         clearAll: (state) => {
-          state.value = []
-          clear();
+          state.value = {}
         }
     }
 })
 
-export const { toggleFavorites, clearAll, initializeList } = favoritesSlice.actions
+export const { addNewProducts ,clearAll, getItem, remove } = productsSlice.actions
 
-export default favoritesSlice.reducer
-
-
-const add = (arr, item) => [...arr, item];
+export default productsSlice.reducer
 
 
-const ToggleFavorites = ( state, item) => {
-    let arr = state.value;
-    let initialLength = arr.length
-
-    arr = arr.filter(e =>  e.key !== item.key)
-
-    if (initialLength === arr.length) {
-      arr = add(arr, item);
-    }
-    return Sort(arr)
+const addToInventory = ( state, item) => {
+    return {...state, ...item}
   };
 
   const Sort = (list) => {

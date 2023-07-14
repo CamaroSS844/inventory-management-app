@@ -1,18 +1,36 @@
+/*
+the new products screen enters new products into database
+available features on this screen are as follows
+> you are able to scan or manually type the barcode into the input
+> as you type the barcode the system checks if there is another product
+   in the database with the same barcode. 
+   *if it is there it will automaticallyfill in the name for you and 
+   highlight the current settings for quantity, minimum level and price per unit.
+   *whatever value you will type into the quantity, minimum level and price pernit fields
+   will increment the current value that is
+   if it dsplays current quantity ----> 20
+   and you type in 23, total quantiy in the database becomes 43 not 23
+ */
+
+
+
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { showMessage, hideMessage } from "react-native-flash-message";
+import { connect } from "react-redux";
+import { addNewProducts } from "../redux/productsListSlice";
+import moment from "moment/moment";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
-const cancel = <MaterialIcons name="cancel" size={20} color={"white"}/>
-const check = <MaterialIcons name="check-circle" size={20} color={"white"}/>
+export const cancel = <MaterialIcons name="cancel" size={20} color={"white"}/>
+export const check = <MaterialIcons name="check-circle" size={20} color={"white"}/>
 
 //inventory app
 
 export const checkFields = (obj, successFunc) => {
   isComplete = true; 
   Object.values(obj).forEach(function(val){
-    console.log(val);
     if(val == ""){  
       isComplete = false;
     }
@@ -25,31 +43,77 @@ export const checkFields = (obj, successFunc) => {
       icon: () => cancel
     });
   }else {
-    successFunc();
+    successFunc(obj);
   }
 }
 
-const FieldsAreComplete = () => {
-
-    showMessage({
-      message: "   Saved!",
-      type: "success",
-      autoHide: true,
-      icon: () => check
-    });
+const isInStock = (action, state) => {
+  if(Object.keys(state).length > 0){
+    doesBarcodeExist = (action in state);
+    if(doesBarcodeExist){
+      value = state[action];
+      return value
+    }
+  }
+  return false
 }
 
-export default class AddNewProduct extends React.Component {
+
+class AddNewProduct extends React.Component {
     constructor(props){
         super(props);
+        this.quantityPlMessage = "Enter quantity"
+        this.minLevelPlMessage = "Enter minimum level"
+        this.pricePlMessage = "Enter Price per unit"
         this.state = {
             barcodeNumber: "",
             productName: "",
             quantity: "",
             minLevel: "",
-            pricePerUnit: ""
+            pricePerUnit: "",
+            quantityPlaceholder: this.quantityPlMessage,
+            minLevelPlaceholder: this.minLevelPlMessage,
+            pricePlaceholder: this.pricePlMessage,
+            instock: false
         }
     }
+
+    autofill = (barcode) => {
+      value = isInStock(barcode, this.props.inventory)
+      if(!value){
+        this.setState({
+          productName: "",
+          quantityPlaceholder: this.quantityPlMessage,
+          minLevelPlaceholder: this.minLevelPlMessage,
+          pricePlaceholder: this.pricePlMessage,
+          instock: false
+      })
+      this.setState({instock: value})
+      return null
+      }
+      this.setState({
+        productName: value.productName,
+        quantityPlaceholder: `Current quantity ---> ${value.quantity}`,
+        minLevelPlaceholder: `Current minimum level ---> ${value.minLevel}`,
+        pricePlaceholder: `Current price per unit ----> ${value.pricePerUnit}`,
+        instock: value
+      })
+    } 
+
+    FieldsAreComplete = (obj) => {
+      console.log(obj)
+      currentItem = {};
+      currentItem[this.state.barcodeNumber] = {...obj, date: moment().format('Do MMMM YYYY, h:mm:ss a')};
+      this.props.addNewProducts(
+        {...currentItem}
+      )
+      showMessage({
+        message: "   Saved!",
+        type: "success",
+        autoHide: true,
+        icon: () => check
+      });
+  }
 
     render(){
         return (
@@ -59,28 +123,32 @@ export default class AddNewProduct extends React.Component {
                 </View>
                 <View style={styles.main}>
                   <View style={{width: "100%", display: "flex", alignItems: "center"}}>
+                        <TextInput
+                          style={styles.input}
+                          placeholder="Enter barcode number"
+                          placeholderTextColor="grey"
+                          editable={true}
+                          value={this.state.barcodeNumber}
+                          onChangeText={(barcodeNumber) => {
+                            this.setState({ barcodeNumber });
+                            this.autofill(barcodeNumber);
+                          }}
+                        />
                        <TextInput
                           style={styles.input}
                           placeholder="Enter product name"
-                          placeholderTextColor={"black"}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.productName}
                           keyboardType={"visible-password"}
                           onChangeText={(productName) => this.setState({ productName })}
                         />
-                         <TextInput
-                          style={styles.input}
-                          placeholder="Enter barcode number"
-                          placeholderTextColor="black"
-                          editable={true}
-                          value={this.state.barcodeNumber}
-                          onChangeText={(barcodeNumber) => this.setState({ barcodeNumber })}
-                        />
+                        
                         
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter quantity"
-                          placeholderTextColor={"black"}
+                          placeholder={this.state.quantityPlaceholder}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.quantity}
                           keyboardType={"numeric"}
@@ -88,8 +156,8 @@ export default class AddNewProduct extends React.Component {
                         />
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter minimum level "
-                          placeholderTextColor={"black"}
+                          placeholder={this.state.minLevelPlaceholder}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.minLevel}
                           keyboardType={"numeric"}
@@ -97,8 +165,8 @@ export default class AddNewProduct extends React.Component {
                         />
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter price per unit "
-                          placeholderTextColor={"black"}
+                          placeholder={this.state.pricePlaceholder}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.pricePerUnit}
                           keyboardType={"numeric"}
@@ -115,7 +183,17 @@ export default class AddNewProduct extends React.Component {
                       })}>
                           <Text style={{color: "white"}}>Clear</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.button} onPress={() => checkFields(this.state, FieldsAreComplete)}>
+                      <TouchableOpacity style={styles.button} onPress={() => {
+                        console.log(this.state.instock)
+                        obj  = {
+                          barcodeNumber: this.state.barcodeNumber,
+                          productName: this.state.productName,
+                          quantity: !this.state.instock? this.state.quantity: `${parseInt(this.state.quantity) + parseInt(this.state.instock.quantity) }`,
+                          minLevel: this.state.minLevel,
+                          pricePerUnit: this.state.pricePerUnit
+                        }
+                        checkFields(obj, this.FieldsAreComplete)}
+                      }>
                           <Text style={{color: "white"}}>Confirm</Text>
                       </TouchableOpacity>
                     </View>
@@ -124,6 +202,18 @@ export default class AddNewProduct extends React.Component {
         )
     }
 }
+const mapStateToProps = state => ({
+  inventory: state.inventoryList.value
+})
+
+const mapDispatchToProps = () => ({
+  addNewProducts,
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps()
+)(AddNewProduct)
 
 const styles = StyleSheet.create({
   Container: {
