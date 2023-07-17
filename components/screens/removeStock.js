@@ -2,15 +2,17 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "reac
 import React from "react";
 import { connect } from "react-redux";
 import { showMessage, hideMessage } from "react-native-flash-message";
-import { getItem, addNewProducts } from "../redux/productsListSlice";
+import { getItem, addNewProducts, remove } from "../redux/productsListSlice";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { cancel, check } from "./newProduct";
+import { isInStock, checkFields } from "./newProduct";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 
 //sorting according to quantity
 //date of adding inventory
 ///date to assist with reordering
+//age analysis
 
 
 //inventory app
@@ -18,46 +20,67 @@ class RemoveProduct extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            barcodeNumber: "123456",
+            barcodeNumber: "",
             productName: "",
-            quantity: "10",//or all for every thing
-            Reason: "too big"
+            quantity: "",//or all for every thing
+            Reason: "",
+            instock: false
         }
+    }
+
+    autofill = (barcode) => {
+      value = isInStock(barcode, this.props.inventory)
+      if(!value){
+        this.setState({
+          productName: "",
+          instock: false
+      })
+      this.setState({instock: value})
+      return null
+      }
+      this.setState({
+        productName: value.productName,
+        instock: value
+      })
     }
 
     popUP = (obj) => {
         Alert.alert(
-          "Enter password to confirm action",
+          `Are you sure you want to remove `,
+          "this item",
           [
             { text: "Cancel", style: "cancel" },
             {
               text: "Confirm",
-              onPress: () => this.props.remove(this.state.barcodeNumber),
+              onPress: () => {
+                this.props.remove(this.state.barcodeNumber)
+                showMessage({
+                  message: `  Saved!`,
+                  type: "success",
+                  autoHide: true,
+                  icon: () => check
+                })
+              },
             },
           ]
         );
-        showMessage({
-            message: `  Saved!`,
-            type: "danger",
-            autoHide: true,
-            icon: () => check
-          });
     }
 
 
-    handleConfirm = () => {
-        value = this.props.getItem(this.state.barcodeNumber);
+    handleConfirm = (obj) => {
+        value = isInStock(this.state.barcodeNumber, this.props.inventory);
         if (typeof(value) != "object"){
             showMessage({
-                message: `  ${this.state.barcodeNumber} does not exist`,
+                message: `  Barcode ${this.state.barcodeNumber} does not exist`,
                 description: `  Check for any typos or rescan the barcode`,
                 type: "danger",
                 autoHide: true,
+                duration: 10000,
                 icon: () => cancel
               });
         }
-        else if (typeof(value) != "object"){
-            this.props.popUP(obj);
+        else{
+            this.popUP(value);
         }
     }
 
@@ -76,7 +99,19 @@ class RemoveProduct extends React.Component {
                           editable={true}
                           value={this.state.barcodeNumber}
                           keyboardType={"visible-password"}
-                          onChangeText={(barcodeNumber) => this.setState({ barcodeNumber })}
+                          onChangeText={(barcodeNumber) => {
+                            this.setState({ barcodeNumber })
+                            this.autofill(barcodeNumber);
+                          }}
+                        />
+                        <TextInput
+                          style={styles.input}
+                          placeholder="Enter product name"
+                          placeholderTextColor={"grey"}
+                          editable={true}
+                          value={this.state.productName}
+                          keyboardType={"visible-password"}
+                          onChangeText={(productName) => this.setState({ productName })}
                         />
                         
                         <TextInput
@@ -111,7 +146,9 @@ class RemoveProduct extends React.Component {
                         }}>
                           <Text style={{color: "white"}}>Clear</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.button} onPress={() => this.handleConfirm()}>
+                      <TouchableOpacity style={styles.button} onPress={() => {
+                        checkFields({...this.state}, this.handleConfirm)
+                        }}>
                           <Text style={{color: "white"}}>Confirm</Text>
                       </TouchableOpacity>
                     </View>
@@ -125,15 +162,16 @@ const mapStateToProps = state => ({
     inventory: state.inventoryList.value
   })
   
-  const mapDispatchToProps = () => ({
-    addNewProducts,
-    getItem
-  })
+const mapDispatchToProps = () => ({
+  addNewProducts,
+  getItem,
+  remove
+})
   
-  export default connect(
-    mapStateToProps,
-    mapDispatchToProps()
-  )(RemoveProduct)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps()
+)(RemoveProduct)
 
 
 const styles = StyleSheet.create({

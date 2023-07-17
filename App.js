@@ -13,6 +13,7 @@ import Receipt from './components/screens/Receipt';
 import InventoryTable from './components/screens/viewInventory';
 import RemoveProduct from './components/screens/removeStock';
 import Reports from './components/screens/reports';
+import InfoScreen from './components/screens/productInfoScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ export default function App() {
           <Stack.Screen name="InventoryTable" component={InventoryTable} />
           <Stack.Screen name="remove product" component={RemoveProduct} />
           <Stack.Screen name="reports" component={Reports} />
+          <Stack.Screen name="prod info" component={InfoScreen} />
         </Stack.Navigator>
       </Provider>
       <FlashMessage position="top" />

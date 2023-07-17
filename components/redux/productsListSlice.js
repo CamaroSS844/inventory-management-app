@@ -14,22 +14,54 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     value: {
-      "1234567890": {
-        barcodeNumber: "1234567890",
-        productName: "books",
-        quantity: "20",
-        minLevel: "5",
-        pricePerUnit: "1"
-      },
+      "1234": {barcodeNumber: "1234", 
+          dateUI: "14th July 2023, 2:41:03 pm",
+          dateCode: "2023-06-05T14:41:03", 
+          minLevel: "5", 
+          pricePerUnit: "1",
+          productName: "music",
+          quantity: "20"
+        }, 
+      "12345": {barcodeNumber: "12345",
+        dateUI: "14th July 2023, 2:41:42 pm",
+        dateCode: "2022-07-14T14:41:42",
+        minLevel: "100", 
+        pricePerUnit: "10", 
+        productName: "soap", 
+        quantity: "1000"
+      }, 
+      "123456": {barcodeNumber: "123456", 
+        dateUI: "14th July 2023, 2:42:03 pm", 
+        dateCode: "2023-03-14T14:42:03",
+        minLevel: "20", 
+        pricePerUnit: "50", 
+        productName: "box", 
+        quantity: "80"
+      }, 
+      "1234567": {barcodeNumber: "1234567", 
+        dateUI: "14th July 2023, 2:42:15 pm", 
+        dateCode: "2023-07-14T14:42:15",
+        minLevel: "5", 
+        pricePerUnit: "2", 
+        productName: "table", 
+        quantity: "4"
+      }, 
+      "1234567890": {barcodeNumber: "1234567890", 
+        dateUI: "14th July 2023, 2:42:15 pm",
+        dateCode: "2023-07-14T14:42:15",
+        minLevel: "5", 
+        pricePerUnit: "1", 
+        productName: "books", 
+        quantity: "20"}
+      }
     }
-}
+
 
 export const productsSlice = createSlice({
     name: 'inventoryList',
     initialState,
     reducers: {
         getItem: (state = {}, action) => {
-          console.log(state);
           value = checkState(state, action);
           if ( !value ) return value;
           return state.value[action.payload]
@@ -37,10 +69,13 @@ export const productsSlice = createSlice({
         ,
         addNewProducts: (state = {}, action) => {
             state.value = addToInventory(state.value, action.payload);
+            console.log(state.value)
           },
         remove: (state= {}, action) => {
-          barcode = action.payload
-          delete state.value.barcode;
+          barcode = `${action.payload}`
+          delete state.value[barcode]
+
+
         },
         clearAll: (state) => {
           state.value = {}

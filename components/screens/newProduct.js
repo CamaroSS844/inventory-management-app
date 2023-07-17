@@ -47,7 +47,7 @@ export const checkFields = (obj, successFunc) => {
   }
 }
 
-const isInStock = (action, state) => {
+export const isInStock = (action, state) => {
   if(Object.keys(state).length > 0){
     doesBarcodeExist = (action in state);
     if(doesBarcodeExist){
@@ -101,9 +101,8 @@ class AddNewProduct extends React.Component {
     } 
 
     FieldsAreComplete = (obj) => {
-      console.log(obj)
       currentItem = {};
-      currentItem[this.state.barcodeNumber] = {...obj, date: moment().format('Do MMMM YYYY, h:mm:ss a')};
+      currentItem[this.state.barcodeNumber] = {...obj, dateUI: moment().format('Do MMMM YYYY, h:mm:ss a'), dateCode: moment().format()};
       this.props.addNewProducts(
         {...currentItem}
       )
@@ -179,7 +178,10 @@ class AddNewProduct extends React.Component {
                         productName: "",
                         quantity: "",
                         minLevel: "",
-                        pricePerUnit: ""
+                        pricePerUnit: "",
+                        quantityPlaceholder: this.quantityPlMessage,
+                        minLevelPlaceholder: this.minLevelPlMessage,
+                        pricePlaceholder: this.pricePlMessage
                       })}>
                           <Text style={{color: "white"}}>Clear</Text>
                       </TouchableOpacity>
