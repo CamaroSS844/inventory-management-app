@@ -1,21 +1,130 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { connect } from "react-redux";
+import { remove } from "../redux/productsListSlice";
+import { check, isInStock } from "./newProduct";
+import { showMessage, hideMessage } from "react-native-flash-message";
+import { cancel } from "./newProduct";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 
+
+
 //inventory app
-export default class AddNewProduct extends React.Component {
+class ProcessSale extends React.Component {
     constructor(props){
         super(props);
+        this.pricePlMessage = "Enter Price per unit"
+        this.quantityPlMessage = "Enter quantity"
         this.state = {
-            barcodeNumber: "",
-            productName: "",
-            quantity: "",
-            minLevel: "",
-            pricePerUnit: ""
+            barcodeNumber: "1234567890",
+            productName: "books",
+            quantity: "5",
+            pricePerUnit: "",
+            instock: false,
+            pricePlaceholder: this.pricePlMessage,
+            quantityPlaceholder: this.quantityPlMessage,
+            cart: {}
         }
     }
+    
+
+    clear = () => {
+      this.setState({
+        barcodeNumber: "",
+        productName: "",
+        quantity: "",
+        minLevel: "",
+        pricePerUnit: "",
+        pricePlaceholder: this.pricePlMessage
+      })
+    }
+
+    preliminaryChecks(){
+      let barcod = this.state.barcodeNumber
+      quantity = parseInt(this.state.quantity)
+
+      //check if barcode exists in the database
+      if (!(this.state.barcodeNumber in this.props.inventory)){
+        showMessage({
+          message: `  Barcode ${this.state.barcodeNumber} does not exist`,
+          description: `  Check for any typos or rescan the barcode`,
+          type: "danger",
+          autoHide: true,
+          duration: 5000,
+          icon: () => cancel
+        });
+        return false
+      }
+      quantInStock = parseInt(this.props.inventory[barcod].quantity)
+
+      //check if quantity entered is in stock
+      if(quantity){
+        if (quantInStock >= quantity){
+
+          showMessage({
+            message: `  Success`,
+            type: "success",
+            autoHide: true,
+            duration: 2000,
+            icon: () => check
+          });
+          return true
+        }else if(quantInStock < quantity){
+          showMessage({
+            message: `  Not Enough ${this.state.productName} left in Stock`,
+            description: `  ${quantInStock} left`,
+            type: "warning",
+            autoHide: true,
+            duration: 5000,
+            icon: () => cancel
+          });
+          return false
+        }
+      }
+    }
+
+
+    nextItem = () => {
+      //if pass then = true if failed  = false
+      passed = this.preliminaryChecks()
+      let barcod = this.state.barcodeNumber
+      currentItem = {};
+      currentItem = {
+        barcodeNumber: barcod,
+        productName: this.state.productName,
+        quantity: this.state.quantity,
+        pricePerUnit: this.props.inventory[barcod].pricePerUnit,
+      };
+      if (passed){
+        list = this.state.cart
+        this.setState({
+          cart: {...this.state.cart, ...currentItem}})
+      }
+        this.clear()
+      }
+    
+
+    autofill = (barcode) => {
+      value = isInStock(barcode, this.props.inventory)
+      if(!value){
+        this.setState({
+          productName: "",
+          pricePlaceholder: this.pricePlMessage,
+          quantityPlaceholder: this.quantityPlMessage,
+          instock: false
+      })
+      this.setState({instock: value})
+      return null
+      }
+      this.setState({
+        productName: value.productName,
+        pricePlaceholder: `Price per unit ----> $${value.pricePerUnit}`,
+        quantityPlaceholder: `Items in stock ---> ${value.quantity}`,
+        instock: value
+      })
+    } 
 
     render(){
         return (
@@ -25,28 +134,33 @@ export default class AddNewProduct extends React.Component {
                 </View>
                 <View style={styles.main}>
                   <View style={{width: "100%", display: "flex", alignItems: "center"}}>
+                        <TextInput
+                          style={styles.input}
+                          placeholder="Enter barcode number"
+                          placeholderTextColor="grey"
+                          editable={true}
+                          value={this.state.barcodeNumber}
+                          onChangeText={(barcodeNumber) => {
+                            this.setState({ barcodeNumber });
+                            this.autofill(barcodeNumber);
+                          }}
+                        />
+                       
                        <TextInput
                           style={styles.input}
-                          placeholder="Enter product name"
-                          placeholderTextColor={"black"}
+                          placeholder="Product name"
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.productName}
                           keyboardType={"visible-password"}
                           onChangeText={(productName) => this.setState({ productName })}
                         />
-                         <TextInput
-                          style={styles.input}
-                          placeholder="Enter barcode number"
-                          placeholderTextColor="black"
-                          editable={true}
-                          value={this.state.barcodeNumber}
-                          onChangeText={(barcodeNumber) => this.setState({ barcodeNumber })}
-                        />
+                        
                         
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter quantity"
-                          placeholderTextColor={"black"}
+                          placeholder={this.state.quantityPlaceholder}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.quantity}
                           keyboardType={"numeric"}
@@ -54,8 +168,8 @@ export default class AddNewProduct extends React.Component {
                         />
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter price per unit "
-                          placeholderTextColor={"black"}
+                          placeholder={this.state.pricePlaceholder}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.pricePerUnit}
                           keyboardType={"numeric"}
@@ -63,14 +177,22 @@ export default class AddNewProduct extends React.Component {
                         />
                     </View>
                     <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly"}}>
-                      <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}}>
+                      <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}} onPress={() => {
+                        this.clear()
+                      }}>
                           <Text style={{color: "white"}}>Clear</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.button}>
+                      <TouchableOpacity style={styles.button} onPress={() => this.nextItem()}>
                           <Text style={{color: "white"}}>Next item</Text>
                       </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={{...styles.button, marginTop: 20}} onPress={() => this.props.navigation.navigate("Receipt")}>
+                    <TouchableOpacity style={{...styles.button, marginTop: 20}} onPress={() => {
+                      if (this.state.barcodeNumber){
+                        this.nextItem()
+                      }
+                      this.props.navigation.navigate("Receipt", {cart: this.state.cart})
+                    }
+                    }>
                           <Text style={{color: "white"}}>Done</Text>
                       </TouchableOpacity>
                 </View>
@@ -78,6 +200,22 @@ export default class AddNewProduct extends React.Component {
         )
     }
 }
+
+
+const mapStateToProps = state => ({
+  inventory: state.inventoryList.value
+})
+
+const mapDispatchToProps = () => ({
+  remove
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps()
+)(ProcessSale)
+
+
 
 const styles = StyleSheet.create({
   Container: {

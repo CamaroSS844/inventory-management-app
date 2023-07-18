@@ -17,7 +17,7 @@ available features on this screen are as follows
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { showMessage, hideMessage } from "react-native-flash-message";
+import { showMessage} from "react-native-flash-message";
 import { connect } from "react-redux";
 import { addNewProducts } from "../redux/productsListSlice";
 import moment from "moment/moment";
@@ -30,8 +30,9 @@ export const check = <MaterialIcons name="check-circle" size={20} color={"white"
 
 export const checkFields = (obj, successFunc) => {
   isComplete = true; 
+  console.log(obj)
   Object.values(obj).forEach(function(val){
-    if(val == ""){  
+    if(val === ""){
       isComplete = false;
     }
   })
@@ -66,11 +67,11 @@ class AddNewProduct extends React.Component {
         this.minLevelPlMessage = "Enter minimum level"
         this.pricePlMessage = "Enter Price per unit"
         this.state = {
-            barcodeNumber: "",
-            productName: "",
-            quantity: "",
-            minLevel: "",
-            pricePerUnit: "",
+            barcodeNumber: "8990",
+            productName: "tree",
+            quantity: "45",
+            minLevel: "7",
+            pricePerUnit: "8",
             quantityPlaceholder: this.quantityPlMessage,
             minLevelPlaceholder: this.minLevelPlMessage,
             pricePlaceholder: this.pricePlMessage,
@@ -93,7 +94,7 @@ class AddNewProduct extends React.Component {
       }
       this.setState({
         productName: value.productName,
-        quantityPlaceholder: `Current quantity ---> ${value.quantity}`,
+        quantityPlaceholder: `Items in stock ---> ${value.quantity}`,
         minLevelPlaceholder: `Current minimum level ---> ${value.minLevel}`,
         pricePlaceholder: `Current price per unit ----> ${value.pricePerUnit}`,
         instock: value

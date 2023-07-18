@@ -20,10 +20,10 @@ class RemoveProduct extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            barcodeNumber: "",
-            productName: "",
-            quantity: "",//or all for every thing
-            Reason: "",
+            barcodeNumber: "1234",
+            productName: "music",
+            quantity: "10",//or all for every thing
+            Reason: "hello its me",
             instock: false
         }
     }
@@ -53,7 +53,7 @@ class RemoveProduct extends React.Component {
             {
               text: "Confirm",
               onPress: () => {
-                this.props.remove(this.state.barcodeNumber)
+                this.props.remove({barcode: this.state.barcodeNumber, quantity: this.state.quantity})
                 showMessage({
                   message: `  Saved!`,
                   type: "success",
