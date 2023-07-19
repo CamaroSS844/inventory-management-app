@@ -1,27 +1,38 @@
 import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet, ScrollView } from "react-native";
 import { Table, TableWrapper, Row } from 'react-native-table-component';
 import React from "react"
+import moment from "moment/moment";
 
 //inventory app
 export default class Receipt extends React.Component {
     constructor(props){
         super(props);
+        this.cart = Object.values(this.props.route.params.cart)
         this.state = {
             tableHead: ['Name', 'Unit Price $', 'Quantity', 'Total $'],
-        widthArr: [170, 70, 70, 70]
+            widthArr: [170, 70, 70, 70]
         }
     }
 
     render(){
         const state = this.state;
         const tableData = [];
-        for (let i = 0; i < 10; i += 1) {
+        total = 0
+        this.cart.forEach(function(value) {
           const rowData = [];
-          for (let j = 0; j < 4; j += 1) {
-            rowData.push(`${i}${j}`);
-          }
+        
+          rowData.push(value.productName);
+          rowData.push(value.pricePerUnit);
+          rowData.push(value.quantity);
+          val = parseInt(value.quantity)*parseInt(value.pricePerUnit)
+          total += val;
+          rowData.push(val);
+          console.log(moment(value.dateCode, "YYYYMMDD").fromNow())
+
+        
           tableData.push(rowData);
-        }
+        })
+        tableData.push(['Total', '__', '__', total])
 
         return (
             <View style={styles.Container}>

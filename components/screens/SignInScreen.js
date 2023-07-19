@@ -34,11 +34,11 @@ export default class LoginScreen extends React.Component {
                           onChangeText={(password) => this.setState({ password })}
                         />
                     </View>
-                    <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.navigate("Dashboard")}}>
+                    <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.push("Dashboard")}}>
                         <Text style={styles.item}>Login</Text>
                     </TouchableOpacity>
                     <View>
-                    <Pressable onPress={() => {this.props.navigation.navigate("sign in")}}>
+                    <Pressable onPress={() => {this.props.navigation.push("sign in")}}>
                             <Text style={{color: "#476C6C", fontWeight: "bold", fontSize: 15, paddingTop: 20}}>
                                 Forgot password?
                             </Text>

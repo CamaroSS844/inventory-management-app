@@ -52,6 +52,7 @@ class InventoryTable extends Component {
     const state = this.state
     const tableData = [];
     total = 0
+    console.log(this.state.inventoryArray)
     this.state.inventoryArray.forEach(function(value) {
       const rowData = [];
 
@@ -83,7 +84,7 @@ class InventoryTable extends Component {
                   tableData.map((rowData, index) => {
                     localStyle = StyleSheet.compose(styles.row, index % 2 === 1 && styles.oddRow);
                     return (
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate("prod info", {info: rowData[5]})} key={index}>
+                    <TouchableOpacity onPress={() => this.props.navigation.push("prod info", {info: rowData[5]})} key={index}>
                         <Row
                           key={index}
                           data={rowData}

@@ -54,12 +54,12 @@ export default class LoginScreen extends React.Component {
                           onChangeText={(branch) => this.setState({ branch })}
                         />
                     </View>
-                    <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.navigate("Dashboard")}}>
+                    <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.push("Dashboard")}}>
                         <Text style={styles.item}>Register</Text>
                     </TouchableOpacity>
                     <View style={styles.para}>
                         <Text>Already have an account  </Text>
-                        <Pressable onPress={() => {this.props.navigation.navigate("sign in")}}>
+                        <Pressable onPress={() => {this.props.navigation.push("sign in")}}>
                             <Text style={{color: "#476C6C", fontWeight: "bold", fontSize: 15}}>
                                 Sign in
                             </Text>
@@ -80,7 +80,7 @@ export default class LoginScreen extends React.Component {
 //     return (
 //         <View>
 //             <Text>List</Text>
-//             <Button onPress={() => props.navigation.navigate("my details")}
+//             <Button onPress={() => props.navigation.push("my details")}
 //             title="open Details"
 //             />
 //         </View>

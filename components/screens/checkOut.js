@@ -37,7 +37,8 @@ class ProcessSale extends React.Component {
         quantity: "",
         minLevel: "",
         pricePerUnit: "",
-        pricePlaceholder: this.pricePlMessage
+        pricePlaceholder: this.pricePlMessage,
+        quantityPlaceholder: this.quantityPlMessage,
       })
     }
 
@@ -86,23 +87,36 @@ class ProcessSale extends React.Component {
     }
 
 
-    nextItem = () => {
+    nextItem = (bool) => {
       //if pass then = true if failed  = false
       passed = this.preliminaryChecks()
-      let barcod = this.state.barcodeNumber
-      currentItem = {};
-      currentItem = {
+      if (passed){
+        let barcod = this.state.barcodeNumber
+        currentItem = {};
+        currentItem[barcod] = {
         barcodeNumber: barcod,
         productName: this.state.productName,
         quantity: this.state.quantity,
         pricePerUnit: this.props.inventory[barcod].pricePerUnit,
       };
-      if (passed){
         list = this.state.cart
         this.setState({
           cart: {...this.state.cart, ...currentItem}})
-      }
+        }
         this.clear()
+        if(bool){
+          return currentItem
+        }
+        return false
+      }
+
+      handleDone = () => {
+        value = false
+        if (this.state.barcodeNumber){
+          value = this.nextItem(true)
+        }
+        if (value)  this.props.navigation.push("Receipt", {cart: {...this.state.cart, ...value}})
+        else this.props.navigation.push("Receipt", {cart: this.state.cart})
       }
     
 
@@ -187,10 +201,7 @@ class ProcessSale extends React.Component {
                       </TouchableOpacity>
                     </View>
                     <TouchableOpacity style={{...styles.button, marginTop: 20}} onPress={() => {
-                      if (this.state.barcodeNumber){
-                        this.nextItem()
-                      }
-                      this.props.navigation.navigate("Receipt", {cart: this.state.cart})
+                        this.handleDone()
                     }
                     }>
                           <Text style={{color: "white"}}>Done</Text>

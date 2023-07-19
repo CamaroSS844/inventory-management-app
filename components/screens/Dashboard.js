@@ -30,19 +30,19 @@ export default class DashboardScreen extends React.Component {
                 </View>
                 <View style={styles.main}>
                     <View style={styles.div}>
-                        <Pressable onPress={() => this.props.navigation.navigate("ProcessSale")}>
+                        <Pressable onPress={() => this.props.navigation.push("ProcessSale")}>
                             {processSale}
                             <Text style={{textAlign: "center"}}>Process</Text>
                             <Text style={{textAlign: "center"}}>Sale</Text>
                         </Pressable>
-                        <Pressable onPress={() => this.props.navigation.navigate("InventoryTable")} >
+                        <Pressable onPress={() => this.props.navigation.push("InventoryTable")} >
                             {viewInventory}
                             <Text style={{textAlign: "center"}}>View</Text>
                             <Text style={{textAlign: "center"}}>Inventory</Text>
                         </Pressable>
                     </View>
                     <View style={styles.div}>
-                        <Pressable onPress={() => this.props.navigation.navigate("new Product")}>
+                        <Pressable onPress={() => this.props.navigation.push("new Product")}>
                             {newStock}
                             <Text style={{textAlign: "center"}}>Add new</Text>
                             <Text style={{textAlign: "center"}}>Stock</Text>
@@ -54,12 +54,12 @@ export default class DashboardScreen extends React.Component {
                         </Pressable>
                     </View>
                     <View style={styles.div}>
-                        <Pressable onPress={() => this.props.navigation.navigate("remove product")}>
+                        <Pressable onPress={() => this.props.navigation.push("remove product")}>
                             {removeStock}
                             <Text style={{textAlign: "center"}}>Remove</Text>
                             <Text style={{textAlign: "center"}}>Stock</Text>
                         </Pressable>
-                        <Pressable onPress={() => this.props.navigation.navigate("reports")}>
+                        <Pressable onPress={() => this.props.navigation.push("reports")}>
                             {reports}
                             <Text style={{textAlign: "center", marginTop: 10}}>Reports</Text>
                         </Pressable>
