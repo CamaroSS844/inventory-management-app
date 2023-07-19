@@ -6,6 +6,7 @@ import { getItem, addNewProducts, remove } from "../redux/productsListSlice";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { cancel, check } from "./newProduct";
 import { isInStock, checkFields } from "./newProduct";
+import moment from "moment/moment";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 
@@ -53,7 +54,12 @@ class RemoveProduct extends React.Component {
             {
               text: "Confirm",
               onPress: () => {
-                this.props.remove({barcode: this.state.barcodeNumber, quantity: this.state.quantity})
+                this.props.remove({
+                  barcode: this.state.barcodeNumber, 
+                  quantity: this.state.quantity,
+                  dateCode: moment().format(),
+                  dateUI: moment().format('Do MMMM YYYY, h:mm:ss a')
+                })
                 showMessage({
                   message: `  Saved!`,
                   type: "success",

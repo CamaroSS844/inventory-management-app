@@ -117,6 +117,8 @@ class ProcessSale extends React.Component {
         }
         if (value)  this.props.navigation.push("Receipt", {cart: {...this.state.cart, ...value}})
         else this.props.navigation.push("Receipt", {cart: this.state.cart})
+
+        this.clear()
       }
     
 

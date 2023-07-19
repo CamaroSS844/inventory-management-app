@@ -1,13 +1,17 @@
-import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { Table, TableWrapper, Row } from 'react-native-table-component';
 import React from "react"
 import moment from "moment/moment";
+import { bulkRemove } from "../redux/productsListSlice";
+import { connect } from "react-redux";
+import { showMessage } from "react-native-flash-message";
+import { check } from "./newProduct";
 
 //inventory app
-export default class Receipt extends React.Component {
+class Receipt extends React.Component {
     constructor(props){
         super(props);
-        this.cart = Object.values(this.props.route.params.cart)
+        this.cart = Object.values(this.props.route.params.cart);
         this.state = {
             tableHead: ['Name', 'Unit Price $', 'Quantity', 'Total $'],
             widthArr: [170, 70, 70, 70]
@@ -47,7 +51,6 @@ export default class Receipt extends React.Component {
                               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
                                 {
                                   tableData.map((rowData, index) => (
-                                    <TouchableOpacity>
                                         <Row
                                           key={index}
                                           data={rowData}
@@ -55,7 +58,6 @@ export default class Receipt extends React.Component {
                                           style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
                                           textStyle={styles.text}
                                         />
-                                    </TouchableOpacity>
                                   ))
                                 }
                               </Table>
@@ -65,9 +67,19 @@ export default class Receipt extends React.Component {
                     </View>
                     <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly"}}>
                       <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}}>
-                          <Text style={{color: "white"}}>Clear</Text>
+                          <Text style={{color: "white"}}>Cancel</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.button}>
+                      <TouchableOpacity style={styles.button} onPress={() => {
+                        this.props.bulkRemove(this.props.route.params.cart)
+                        showMessage({
+                          message: `  Success`,
+                          type: "success",
+                          autoHide: true,
+                          duration: 2000,
+                          icon: () => check
+                        });
+                        this.props.navigation.pop()
+                        }}>
                           <Text style={{color: "white"}}>Confirm</Text>
                       </TouchableOpacity>
                     </View>
@@ -80,6 +92,19 @@ export default class Receipt extends React.Component {
     }
 }
 
+
+const mapStateToProps = state => ({
+  inventory: state.inventoryList.value
+})
+
+const mapDispatchToProps = () => ({
+  bulkRemove
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps()
+)(Receipt)
 
 
 

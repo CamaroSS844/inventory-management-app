@@ -52,7 +52,6 @@ class InventoryTable extends Component {
     const state = this.state
     const tableData = [];
     total = 0
-    console.log(this.state.inventoryArray)
     this.state.inventoryArray.forEach(function(value) {
       const rowData = [];
 

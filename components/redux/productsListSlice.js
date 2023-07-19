@@ -62,6 +62,11 @@ Transactions
 Stock
 >>>>display of the total stock out and in and total in hand.
 >>>>display that on a pie chart if possible
+sales---> adjust time as daily weekly monthly
+added Stock or purchases -----> 
+remove stock -----> include reason and date(spoilt and expired)
+  and explanation
+transferred stock ----> date and branch transferred to
 
 
 
@@ -73,6 +78,7 @@ adjustable intervals, daily weekly, monthly
 display monthly graphs or 
 
 then by end of month should produce profit and loss account
+
 */
 
 
@@ -141,20 +147,26 @@ export const productsSlice = createSlice({
           if (quantity == "all"){
             delete state.value[barcode];
           }else {
-            state.value[barcode].quantity -= action.payload.quantity; 
+            decrement(state, barcode, action.payload);
           }
         },
-        decrement: (state={}, action) => {
+        bulkRemove: (state={}, action) => {
+          Object.values(action.payload).forEach(value => {
+            decrement(state, value.barcodeNumber, value);
+          })
 
         }
     }
 })
 
 
-export const { addNewProducts ,clearAll, getItem, remove } = productsSlice.actions
+export const { addNewProducts ,clearAll, getItem, remove, bulkRemove } = productsSlice.actions
 
 export default productsSlice.reducer
 
+function decrement(state, barcode, action){
+  state.value[barcode].quantity -= action.quantity;
+}
 
 const addToInventory = ( state, item) => {
     return {...state, ...item}
