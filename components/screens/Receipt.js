@@ -3,6 +3,7 @@ import { Table, TableWrapper, Row } from 'react-native-table-component';
 import React from "react"
 import moment from "moment/moment";
 import { bulkRemove } from "../redux/productsListSlice";
+import { logNewSale } from "../redux/salesLogSlice";
 import { connect } from "react-redux";
 import { showMessage } from "react-native-flash-message";
 import { check } from "./newProduct";
@@ -16,6 +17,47 @@ class Receipt extends React.Component {
             tableHead: ['Name', 'Unit Price $', 'Quantity', 'Total $'],
             widthArr: [170, 70, 70, 70]
         }
+    }
+
+    logPrep = () => {
+      let payload = {}
+      this.cart.forEach((item) => {
+        payload = {...payload, [item.dateCode]: {[item.barcode]: {
+          dateUI: moment(item.dateCode, "YYYYMMDD").format("Do MMMM YYYY, h:mm:ss a"),
+          quantity: item.quantity,
+          totalValue: item.pricePerUnit*item.quantity
+        }}}
+      })
+      this.props.logNewSale(payload)
+    }
+
+    handleConfirm = () => {
+      this.props.bulkRemove(this.props.route.params.cart)
+      /*
+        action.payload format
+        "2023-07-14T14:41:42": {
+          "12345":{
+            dateUI: "14th July 2023, 2:41:42 pm",
+            quantity: "10",
+            totalValue: "20"
+          },
+          "1234567":{ 
+            dateUI: "14th July 2023, 2:41:42 pm",
+            quantity: "2",
+            totalValue: "2"
+          },
+        }
+      */
+      this.logPrep()
+
+      showMessage({
+        message: `  Success`,
+        type: "success",
+        autoHide: true,
+        duration: 2000,
+        icon: () => check
+      });
+      this.props.navigation.pop()
     }
 
     render(){
@@ -70,15 +112,7 @@ class Receipt extends React.Component {
                           <Text style={{color: "white"}}>Cancel</Text>
                       </TouchableOpacity>
                       <TouchableOpacity style={styles.button} onPress={() => {
-                        this.props.bulkRemove(this.props.route.params.cart)
-                        showMessage({
-                          message: `  Success`,
-                          type: "success",
-                          autoHide: true,
-                          duration: 2000,
-                          icon: () => check
-                        });
-                        this.props.navigation.pop()
+                        this.handleConfirm();
                         }}>
                           <Text style={{color: "white"}}>Confirm</Text>
                       </TouchableOpacity>
@@ -98,7 +132,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = () => ({
-  bulkRemove
+  bulkRemove,
+  logNewSale
 })
 
 export default connect(

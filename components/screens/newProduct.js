@@ -20,6 +20,7 @@ import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { showMessage} from "react-native-flash-message";
 import { connect } from "react-redux";
 import { addNewProducts } from "../redux/productsListSlice";
+import { logStocking } from "../redux/newScreenLogSlice";
 import moment from "moment/moment";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
@@ -101,12 +102,55 @@ class AddNewProduct extends React.Component {
       })
     } 
 
+    logPrep = () => {
+
+      /*
+        action.payload format
+        "2023-07-14": {
+          "12345":{
+            dateUI: "14th July 2023, 2:41:42 pm",
+            quantity: "10",
+            category: "restock"
+          },
+          "1234567":{ 
+            dateUI: "14th July 2023, 2:41:42 pm",
+            quantity: "2",
+            category: "New Stock"
+          },
+        }
+      */
+      this.props.logStocking({
+        [moment().format()]: {
+          [this.state.barcodeNumber]: {
+            dateUI: moment().format('Do MMMM YYYY, h:mm:ss a'),
+            quantity: this.state.quantity,
+            category: this.state.instock? 'restock': 'New Stock'
+          }
+        }
+      })
+
+    }
+
+    handleConfirm = () => {
+      obj  = {
+        barcodeNumber: this.state.barcodeNumber,
+        productName: this.state.productName,
+        quantity: !this.state.instock? this.state.quantity: `${parseInt(this.state.quantity) + parseInt(this.state.instock.quantity) }`,
+        minLevel: this.state.minLevel,
+        pricePerUnit: this.state.pricePerUnit
+      }
+      checkFields(obj, this.FieldsAreComplete)
+    }
+
     FieldsAreComplete = (obj) => {
       currentItem = {};
       currentItem[this.state.barcodeNumber] = {...obj, dateUI: moment().format('Do MMMM YYYY, h:mm:ss a'), dateCode: moment().format()};
       this.props.addNewProducts(
         {...currentItem}
       )
+
+      this.logPrep()
+
       showMessage({
         message: "   Saved!",
         type: "success",
@@ -187,15 +231,7 @@ class AddNewProduct extends React.Component {
                           <Text style={{color: "white"}}>Clear</Text>
                       </TouchableOpacity>
                       <TouchableOpacity style={styles.button} onPress={() => {
-                        console.log(this.state.instock)
-                        obj  = {
-                          barcodeNumber: this.state.barcodeNumber,
-                          productName: this.state.productName,
-                          quantity: !this.state.instock? this.state.quantity: `${parseInt(this.state.quantity) + parseInt(this.state.instock.quantity) }`,
-                          minLevel: this.state.minLevel,
-                          pricePerUnit: this.state.pricePerUnit
-                        }
-                        checkFields(obj, this.FieldsAreComplete)}
+                        this.handleConfirm()}
                       }>
                           <Text style={{color: "white"}}>Confirm</Text>
                       </TouchableOpacity>
@@ -211,6 +247,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = () => ({
   addNewProducts,
+  logStocking
 })
 
 export default connect(

@@ -2,10 +2,11 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "reac
 import React from "react";
 import { connect } from "react-redux";
 import { showMessage, hideMessage } from "react-native-flash-message";
-import { getItem, addNewProducts, remove } from "../redux/productsListSlice";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { remove } from "../redux/productsListSlice";
 import { cancel, check } from "./newProduct";
 import { isInStock, checkFields } from "./newProduct";
+import { logNewRemoval } from "../redux/removalsLogSlice";
 import moment from "moment/moment";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
@@ -21,10 +22,11 @@ class RemoveProduct extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            barcodeNumber: "1234",
-            productName: "music",
-            quantity: "10",//or all for every thing
-            Reason: "hello its me",
+            barcodeNumber: "",
+            productName: "",
+            quantity: "",//or all for every thing
+            Reason: "",
+            Category: "",
             instock: false
         }
     }
@@ -45,6 +47,37 @@ class RemoveProduct extends React.Component {
       })
     }
 
+    logRemovalPrep = () => {
+      /*
+        action.payload format
+        "2023-07-14": {
+          "12345":{
+            dateUI: "14th July 2023, 2:41:42 pm",
+            quantity: "10",
+            category: "damaged",
+            reason: "fell off the shelf"
+          },
+          "1234567":{ 
+            dateUI: "14th July 2023, 2:41:42 pm",
+            quantity: "2",
+            category: "expired",
+            reason: "spent too long in the freezer"
+          },
+        }
+      */
+      let payload = {};
+      time = moment().format();
+      payload[moment().format()] = {
+        [this.state.barcodeNumber]: {
+          dateUI: moment().format('Do MMMM YYYY, h:mm:ss a'),
+          quantity: this.state.quantity,
+          category: this.state.Category,
+          reason: this.state.Reason
+        }
+      }
+      this.props.logNewRemoval({...payload});
+    }
+
     popUP = (obj) => {
         Alert.alert(
           `Are you sure you want to remove `,
@@ -60,6 +93,9 @@ class RemoveProduct extends React.Component {
                   dateCode: moment().format(),
                   dateUI: moment().format('Do MMMM YYYY, h:mm:ss a')
                 })
+              
+                this.logRemovalPrep()
+
                 showMessage({
                   message: `  Saved!`,
                   type: "success",
@@ -131,7 +167,16 @@ class RemoveProduct extends React.Component {
                         />
                         <TextInput
                           style={styles.input}
-                          placeholder="Explain why it was removed "
+                          placeholder="Category ~~ damaged / expired "
+                          placeholderTextColor={"grey"}
+                          editable={true}
+                          value={this.state.Category}
+                          keyboardType={"numeric"}
+                          onChangeText={(Category) => this.setState({ Category })}
+                        />
+                        <TextInput
+                          style={styles.input}
+                          placeholder=" Explain further "
                           placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.Reason}
@@ -146,7 +191,6 @@ class RemoveProduct extends React.Component {
                                 barcodeNumber: "",
                                 productName: "",
                                 quantity: "",
-                                minLevel: "",
                                 Reason: ""
                             })
                         }}>
@@ -169,9 +213,8 @@ const mapStateToProps = state => ({
   })
   
 const mapDispatchToProps = () => ({
-  addNewProducts,
-  getItem,
-  remove
+  remove,
+  logNewRemoval
 })
   
 export default connect(

@@ -170,16 +170,4 @@ function decrement(state, barcode, action){
 
 const addToInventory = ( state, item) => {
     return {...state, ...item}
-  };
-
-  const Sort = (list) => {
-    for (let i = 0; i < list.length - 1; i++) {
-      if (parseInt(list[i + 1].key) < parseInt(list[i].key)) {
-        let temporalList = list[i];
-        list[i] = list[i + 1];
-        list[i + 1] = temporalList;
-        Sort(list);
-      }
-    }
-    return list;
-  };
+};
