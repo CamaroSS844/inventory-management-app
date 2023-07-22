@@ -21,6 +21,7 @@ import { showMessage} from "react-native-flash-message";
 import { connect } from "react-redux";
 import { addNewProducts } from "../redux/productsListSlice";
 import { logStocking } from "../redux/newScreenLogSlice";
+import { logProduct } from "../redux/productNameSlice";
 import moment from "moment/moment";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
@@ -128,6 +129,7 @@ class AddNewProduct extends React.Component {
           }
         }
       })
+      this.props.logProduct({[this.state.barcodeNumber]: this.state.productName})
 
     }
 
@@ -247,7 +249,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = () => ({
   addNewProducts,
-  logStocking
+  logStocking,
+  logProduct
 })
 
 export default connect(

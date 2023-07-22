@@ -132,12 +132,6 @@ export const productsSlice = createSlice({
     name: 'inventoryList',
     initialState,
     reducers: {
-        getItem: (state = {}, action) => {
-          value = checkState(state, action);
-          if ( !value ) return value;
-          return state.value[action.payload]
-        }
-        ,
         addNewProducts: (state = {}, action) => {
             state.value = addToInventory(state.value, action.payload);
         },
@@ -160,7 +154,7 @@ export const productsSlice = createSlice({
 })
 
 
-export const { addNewProducts ,clearAll, getItem, remove, bulkRemove } = productsSlice.actions
+export const { addNewProducts ,clearAll, remove, bulkRemove } = productsSlice.actions
 
 export default productsSlice.reducer
 

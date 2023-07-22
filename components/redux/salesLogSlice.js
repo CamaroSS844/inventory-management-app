@@ -77,7 +77,6 @@ export const salesLogSlice = createSlice({
               },
             }
             */
-            console.log(state.value);
             state.value = addToInventory(state.value, action.payload);
         },
     }

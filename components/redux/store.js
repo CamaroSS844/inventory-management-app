@@ -3,6 +3,7 @@ import productsReducer from "./productsListSlice";
 import salesLogReducer from "./salesLogSlice";
 import removalsLogReducer from "./removalsLogSlice";
 import newScreenLogReducer from "./newScreenLogSlice";
+import productNameReducer from "./productNameSlice";
 
 export const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
         salesLog: salesLogReducer,
         removalsLog: removalsLogReducer,
         newScreenLog: newScreenLogReducer,
+        productLog: productNameReducer
     }
 }) 
 
