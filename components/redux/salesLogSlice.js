@@ -13,7 +13,7 @@ sales slice: {
 
 stock added 
 sales
-stock removed
+stock removed 
 adjustable intervals, daily weekly, monthly
 display monthly graphs or 
 */

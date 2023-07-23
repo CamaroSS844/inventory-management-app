@@ -8,26 +8,33 @@ import { connect } from "react-redux";
 import { showMessage } from "react-native-flash-message";
 import { check } from "./newProduct";
 
+
+//cant remove unwanted items from receipt
+
+
 //inventory app
 class Receipt extends React.Component {
     constructor(props){
         super(props);
-        this.cart = Object.values(this.props.route.params.cart);
         this.state = {
             tableHead: ['Name', 'Unit Price $', 'Quantity', 'Total $'],
-            widthArr: [170, 70, 70, 70]
+            widthArr: [170, 70, 70, 70],
+            cart: this.props.route.params.cart
         }
+        this.cart = Object.values(this.state.cart);
     }
 
     logPrep = () => {
       let payload = {}
+      date = moment().format()
       this.cart.forEach((item) => {
-        payload = {...payload, [item.dateCode]: {[item.barcode]: {
-          dateUI: moment(item.dateCode, "YYYYMMDD").format("Do MMMM YYYY, h:mm:ss a"),
+        payload = {...payload, [date]: {[item.barcodeNumber]: {
+          dateUI: moment().format("Do MMMM YYYY, h:mm:ss a"),
           quantity: item.quantity,
           totalValue: item.pricePerUnit*item.quantity
         }}}
       })
+      console.log(payload);
       this.props.logNewSale(payload)
     }
 
@@ -57,7 +64,7 @@ class Receipt extends React.Component {
         duration: 2000,
         icon: () => check
       });
-      this.props.navigation.pop()
+      this.props.navigation.replace("ProcessSale")
     }
 
     render(){
@@ -73,7 +80,6 @@ class Receipt extends React.Component {
           val = parseInt(value.quantity)*parseInt(value.pricePerUnit)
           total += val;
           rowData.push(val);
-          console.log(moment(value.dateCode, "YYYYMMDD").fromNow())
 
         
           tableData.push(rowData);
@@ -93,6 +99,7 @@ class Receipt extends React.Component {
                               <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
                                 {
                                   tableData.map((rowData, index) => (
+                                      <TouchableOpacity key={index}>
                                         <Row
                                           key={index}
                                           data={rowData}
@@ -100,6 +107,7 @@ class Receipt extends React.Component {
                                           style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
                                           textStyle={styles.text}
                                         />
+                                      </TouchableOpacity>
                                   ))
                                 }
                               </Table>

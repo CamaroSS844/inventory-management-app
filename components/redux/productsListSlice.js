@@ -85,15 +85,17 @@ then by end of month should produce profit and loss account
 
 const initialState = {
     value: {
-      "1234": {barcodeNumber: "1234", 
+      "1234": {
+          barcodeNumber: "1234", 
           dateUI: "14th July 2023, 2:41:03 pm",
           dateCode: "2023-06-05T14:41:03", 
           minLevel: "5", 
           pricePerUnit: "1",
           productName: "music",
           quantity: "20"
-        }, 
-      "12345": {barcodeNumber: "12345",
+      }, 
+      "12345": {
+        barcodeNumber: "12345",
         dateUI: "14th July 2023, 2:41:42 pm",
         dateCode: "2022-07-14T14:41:42",
         minLevel: "100", 
@@ -101,7 +103,8 @@ const initialState = {
         productName: "soap", 
         quantity: "1000"
       }, 
-      "123456": {barcodeNumber: "123456", 
+      "123456": {
+        barcodeNumber: "123456", 
         dateUI: "14th July 2023, 2:42:03 pm", 
         dateCode: "2023-03-14T14:42:03",
         minLevel: "20", 
@@ -109,7 +112,8 @@ const initialState = {
         productName: "box", 
         quantity: "80"
       }, 
-      "1234567": {barcodeNumber: "1234567", 
+      "1234567": {
+        barcodeNumber: "1234567", 
         dateUI: "14th July 2023, 2:42:15 pm", 
         dateCode: "2023-07-14T14:42:15",
         minLevel: "5", 
@@ -117,13 +121,15 @@ const initialState = {
         productName: "table", 
         quantity: "4"
       }, 
-      "1234567890": {barcodeNumber: "1234567890", 
+      "1234567890": {
+        barcodeNumber: "1234567890", 
         dateUI: "14th July 2023, 2:42:15 pm",
         dateCode: "2023-07-14T14:42:15",
         minLevel: "5", 
         pricePerUnit: "1", 
         productName: "books", 
-        quantity: "20"}
+        quantity: "20"
+      }
       }
     }
 
@@ -159,7 +165,10 @@ export const { addNewProducts ,clearAll, remove, bulkRemove } = productsSlice.ac
 export default productsSlice.reducer
 
 function decrement(state, barcode, action){
-  state.value[barcode].quantity -= action.quantity;
+  value = state.value[barcode].quantity - action.quantity;
+  if (value > 0){
+    state.value[barcode].quantity = value;
+  }
 }
 
 const addToInventory = ( state, item) => {

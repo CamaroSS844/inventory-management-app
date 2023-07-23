@@ -12,8 +12,8 @@ import ProcessSale from './components/screens/checkOut';
 import Receipt from './components/screens/Receipt';
 import InventoryTable from './components/screens/viewInventory';
 import RemoveProduct from './components/screens/removeStock';
-import Reports from './components/screens/reports';
 import InfoScreen from './components/screens/productInfoScreen';
+import Reports from './components/screens/reportLand';
 
 const Stack = createNativeStackNavigator();
 

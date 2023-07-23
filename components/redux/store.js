@@ -10,7 +10,7 @@ export const store = configureStore({
         inventoryList: productsReducer,
         salesLog: salesLogReducer,
         removalsLog: removalsLogReducer,
-        newScreenLog: newScreenLogReducer,
+        stockingLog: newScreenLogReducer,
         productLog: productNameReducer
     }
 }) 
