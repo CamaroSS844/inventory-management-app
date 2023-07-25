@@ -28,7 +28,10 @@ class Receipt extends React.Component {
       let payload = {}
       date = moment().format()
       this.cart.forEach((item) => {
-        payload = {...payload, [date]: {[item.barcodeNumber]: {
+        console.log(item);
+        payload = {[date]: {
+          ...payload[date],
+          [item.barcodeNumber]: {
           dateUI: moment().format("Do MMMM YYYY, h:mm:ss a"),
           quantity: item.quantity,
           totalValue: item.pricePerUnit*item.quantity
@@ -64,7 +67,7 @@ class Receipt extends React.Component {
         duration: 2000,
         icon: () => check
       });
-      this.props.navigation.replace("ProcessSale")
+      this.props.navigation.replace("Dashboard")
     }
 
     render(){

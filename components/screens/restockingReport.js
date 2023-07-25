@@ -16,7 +16,9 @@ class RestockingReport extends React.Component {
                 <View style={styles.main}>
                     <View>
                         <Text>Overall Stock</Text>
-                        <Text></Text>
+                        <Text>
+                            
+                        </Text>
                     </View>
                 </View>
             </View>
@@ -27,7 +29,8 @@ class RestockingReport extends React.Component {
 
 const mapStateToProps = state => ({
     inventory: state.inventoryList.value,
-  })
+    stockingLog: state.stockingLog.value,
+})
   
   const mapDispatchToProps = () => ({
     
