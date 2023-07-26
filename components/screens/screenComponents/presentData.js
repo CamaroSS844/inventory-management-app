@@ -4,7 +4,7 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import sort from "./sortFuncForReports";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 
-export const PresentData = ({keysList, dataObject, valuesList}) => {
+export const PresentData = ({keysList, valuesList, category}) => {
 
     //dropdown menu to select time period
     const [required, setRequired] = React.useState(366);
@@ -17,10 +17,10 @@ export const PresentData = ({keysList, dataObject, valuesList}) => {
         {key:'180', value:'6 months'},
         {key:'365', value:'1 year'},
     ]
-    tableHead = ['Name', 'Quantity', 'Total $', 'date']
+    tableHead = ['Name', 'Quantity', category, 'date']
     widthArr = [110, 70, 70, 140]
     const tableData = [];
-    orderedList = sort([...keysList], [...valuesList], required)
+    orderedList = sort([...keysList], [...valuesList], required)[1]
     const [values, setValues] = React.useState(orderedList);
 
     const handleFilter = (requiredInterval) => {
@@ -37,11 +37,11 @@ export const PresentData = ({keysList, dataObject, valuesList}) => {
             let rowData = []
             rowData.push(keyList[i])
             rowData.push(valuesList[i].quantity)
-            rowData.push(valuesList[i].totalValue)
+            rowData.push(valuesList[i][category])
             rowData.push(valuesList[i].dateUI)
             tableData.push(rowData)
         }
-        tableData.push([' '])
+        tableData.push([' ', ' ', ' ', ' '])
     })
 
 

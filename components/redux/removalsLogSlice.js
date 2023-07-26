@@ -39,7 +39,7 @@ const initialState = {
         },
         "1234567":{ 
           dateUI: "14th July 2022, 2:41:42 pm",
-          quantity: "2",
+          quantity: "5",
           category: "damaged",
           reason: "during delivery"
         },

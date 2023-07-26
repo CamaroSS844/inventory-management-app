@@ -46,6 +46,23 @@ const initialState = {
           totalValue: "50"
         }
       }, 
+      "2023-07-14T14:41:42": {
+        "12345":{
+          dateUI: "14th July 2023, 2:41:42 pm",
+          quantity: "10",
+          totalValue: "20"
+        },
+        "1234567":{ 
+          dateUI: "14th July 2023, 2:41:42 pm",
+          quantity: "2",
+          totalValue: "2"
+        },
+        "1234567890": { 
+          dateUI: "14th July 2023, 2:41:42 pm",
+          quantity: "10",
+          totalValue: "50"
+        }
+      }, 
       "2023-03-14T14:42:03": {
         "123456":{
           dateUI: "14th March 2023, 2:42:03 pm",
@@ -88,5 +105,9 @@ export const { logNewSale } = salesLogSlice.actions
 export default salesLogSlice.reducer
 
 const addToInventory = ( state, item) => {
-    return {...state, ...item}
+    i = item.date;
+    console.log(state)
+    j = {...state, ...item}
+    console.log(j)
+    return j
 };

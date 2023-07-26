@@ -1,18 +1,21 @@
-import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { connect } from "react-redux";
-import React from "react"
+import { PresentData } from "./screenComponents/presentData";
+import React from "react";
 
 
 //inventory app
 class RemovalsReport extends React.Component {
     constructor(props){
         super(props);
+        this.keyslist = Object.keys(this.props.removals);
+        this.valueslist = Object.values(this.props.removals);
     }
     render(){
         return (
             <View style={styles.Container}>
                 <View style={styles.main}>
-                    <Text>at least we stole the show</Text>
+                    <PresentData keysList={[...this.keyslist]} valuesList={[...this.valueslist]}  category={'category'}/>
                 </View>
             </View>
         )
@@ -20,7 +23,8 @@ class RemovalsReport extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    inventory: state.inventoryList.value
+    inventory: state.inventoryList.value,
+    removals: state.removalsLog.value,
   })
   
   const mapDispatchToProps = () => ({
@@ -43,10 +47,11 @@ const styles = StyleSheet.create({
         display: "flex",
         alignItems: "center",
         width: "100%",
-        height: "90%",
+        height: "93%",
+        backgroundColor: "#D9D9D9",
         borderTopRightRadius: 50,
         borderTopLeftRadius: 50,
-        paddingTop: 20
+        paddingTop: 30
     },
     div: {
         display: "flex",

@@ -25,24 +25,24 @@ const initialState = {
       "2023-06-05": {
         "1234":{ 
           dateUI: "14th June 2023, 2:41:03 pm",//date to display on ui
-          quantity: "5",
+          quantity: "100",
           category: "New Stock",
         }
       }, 
       "2022-07-14": {
         "1234":{
           dateUI: "14th July 2022, 2:41:42 pm",
-          quantity: "10",
+          quantity: "50",
           category: "Restock",
         },
         "1234567":{ 
           dateUI: "14th July 2022, 2:41:42 pm",
-          quantity: "2",
+          quantity: "20",
           category: "Restock",
         },
         "1234567890": { 
           dateUI: "14th July 2022, 2:41:42 pm",
-          quantity: "10",
+          quantity: "30",
           category: "New Stock"
         }
       }, 

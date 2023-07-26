@@ -101,7 +101,7 @@ const initialState = {
         minLevel: "100", 
         pricePerUnit: "10", 
         productName: "soap", 
-        quantity: "1000"
+        quantity: "800"
       }, 
       "123456": {
         barcodeNumber: "123456", 

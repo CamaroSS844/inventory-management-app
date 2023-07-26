@@ -1,6 +1,6 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { connect } from "react-redux";
-import React, { useState } from "react";
+import React from "react";
 import { PresentData } from "./screenComponents/presentData";
 
 //inventory app
@@ -9,15 +9,13 @@ class SalesReport extends React.Component {
         super(props);
         this.keyslist = Object.keys(this.props.sales);
         this.valueslist = Object.values(this.props.sales);
-        this.state = {
-            object: this.props.sales
-        }
     }
     render(){
+        console.log('sales screen')
         return (
             <View style={styles.Container}>
                 <View style={styles.main}>
-                    <PresentData keysList={[...this.keyslist]} valuesList={[...this.valueslist]}  dataObject={{...this.props.sales}}/>
+                    <PresentData keysList={[...this.keyslist]} valuesList={[...this.valueslist]}  category={'totalValue'}/>
                 </View>
             </View>
         )
@@ -49,11 +47,11 @@ const mapStateToProps = state => ({
         display: "flex",
         alignItems: "center",
         width: "100%",
-        height: "90%",
+        height: "93%",
         backgroundColor: "#D9D9D9",
         borderTopRightRadius: 50,
         borderTopLeftRadius: 50,
-        paddingTop: 20
+        paddingTop: 30
     },
     div: {
         display: "flex",

@@ -7,55 +7,49 @@ import {
   StackedBarChart
 } from "react-native-chart-kit";
 import React from "react"
+import sortFuncForReports from "./screenComponents/sortFuncForReports";
 const screenWidth = Dimensions.get("window").width;
 
 const chartConfig = {
-  backgroundGradientFrom: "#1E2923",
+  backgroundGradientFrom: "#10ab10",
   backgroundGradientFromOpacity: 0,
-  backgroundGradientTo: "#08130D",
-  backgroundGradientToOpacity: 0.5,
-  color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+  backgroundGradientTo: "#008000",
+  backgroundGradientToOpacity: 0.6,
+  color: (opacity = 1) => `black`,
   strokeWidth: 2, // optional, default 3
   barPercentage: 0.5,
   useShadowColorFromDataset: false // optional
 };
-const data = [
-  {
-    name: "Seoul",
-    population: 21500000,
-    color: "rgba(131, 167, 234, 1)",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15
-  },
-  {
-    name: "Toronto",
-    population: 2800000,
-    color: "#F00",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15
-  },
-  {
-    name: "Beijing",
-    population: 527612,
-    color: "red",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15
-  },
-  {
-    name: "New York",
-    population: 8538000,
-    color: "#ffffff",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15
-  },
-  {
-    name: "Moscow",
-    population: 11920000,
-    color: "rgb(0, 0, 255)",
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 15
-  }
-];
+
+const SalesBarGraph = ({keys, values, names}) => {
+  list = sortFuncForReports(keys, values, 30)
+  label = [];
+  info = []
+  list[1].forEach(val => {
+    Object.keys(val).forEach(val => label.push(names[val]))
+    Object.values(val).forEach(val => info.push(parseInt(val.quantity)))
+  })
+  data = {
+    labels: label,
+    datasets: [
+      {
+        data: info,
+      }
+    ]
+  };
+  return (
+    <BarChart
+      data={data}
+      width={screenWidth}
+      height={230}
+      yAxisLabel=" "
+      chartConfig={chartConfig}
+      verticalLabelRotation={0}
+    />
+  )
+}
+
+
 
 //inventory app
 class ReportSummary extends React.Component {
@@ -70,24 +64,18 @@ class ReportSummary extends React.Component {
         this.salesVal = Object.values(this.props.sales).forEach(value => {
           this.sales.push(Object.values(value));
         });
-        this.state = {
-            total: 0
-        }
+        this.stockingLog = [];
+        this.stockingLogVal = Object.values(this.props.stockingLog).forEach(value => {
+          this.stockingLog.push(Object.values(value));
+        });
     }
-
-    // deconstruct = () => {
-    //   let 
-    // }
-
-  // calculateTotal = () => {
-      
-  // }
 
     render(){
       let total = 0;
       let stockInHand = 0;
       let totalRemovals = 0;
       let totalSales = 0;
+      let totalStockingLog = 0;
       this.inventory.forEach(item => {
           total += parseInt(item.quantity)
           stockInHand += parseInt(item.quantity)
@@ -104,28 +92,57 @@ class ReportSummary extends React.Component {
           totalSales += parseInt(val.quantity)
         })
       })
+      this.stockingLog.forEach(item => {
+        item.forEach(val => {
+          total += parseInt(val.quantity)
+          totalStockingLog += parseInt(val.quantity)
+        })
+      })
 
 
-      console.log(`total: ${total}`)
-      console.log(`stock in hand: ${stockInHand}`)
-      console.log(`totalRemovals: ${totalRemovals}`)
-      console.log(`totalSales: ${totalSales}`)
+      const data = [
+        {
+          name: "In Hand",
+          population: parseInt(stockInHand),
+          color: "green",
+          legendFontColor: "#7F7F7F",
+          legendFontSize: 15
+        },
+        {
+          name: "OUT",
+          population: parseInt(totalRemovals) + parseInt(totalSales),
+          color: "#F00",
+          legendFontColor: "#7F7F7F",
+          legendFontSize: 15
+        },
+        {
+          name: "IN",
+          population: totalStockingLog,
+          color: "yellow",
+          legendFontColor: "#7F7F7F",
+          legendFontSize: 15
+        }
+      ]
 
 
         return (
             <View style={styles.Container}>
                 <View style={styles.main}>
+                <Text style={{paddingTop: 20}}>Overall stock</Text>
                 <PieChart
                   data={data}
-                  width={screenWidth}
-                  height={220}
+                  width={300}
+                  height={120}
                   chartConfig={chartConfig}
                   accessor={"population"}
                   backgroundColor={"transparent"}
-                  paddingLeft={"15"}
-                  center={[10, 50]}
+                  paddingLeft={"5"}
+                  center={[0, 5]}
                   absolute
                 />
+                <Text style={{padding: 20}}>Sales summary</Text>
+                <SalesBarGraph keys={[...Object.keys(this.props.sales)]}  values={[...Object.values(this.props.sales)]} names={{...this.props.productName}}/>
+
                 </View>
             </View>
         )
@@ -137,7 +154,8 @@ const mapStateToProps = state => ({
   inventory: state.inventoryList.value,
   stockingLog: state.stockingLog.value,
   removals: state.removalsLog.value,
-  sales: state.salesLog.value
+  sales: state.salesLog.value,
+  productName: state.productLog.value
 })
 
 const mapDispatchToProps = () => ({
@@ -163,7 +181,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         height: "90%",
-        paddingBottom: 40
+        paddingBottom: 40,
+        backgroundColor: "#D9D9D9",
     },
     div: {
         display: "flex",
