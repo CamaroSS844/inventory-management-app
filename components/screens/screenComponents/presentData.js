@@ -4,46 +4,51 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import sort from "./sortFuncForReports";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 
-export const PresentData = ({keysList, valuesList, category}) => {
+export class PresentData extends React.Component {
+    constructor(props) {
+      super(props);
+      this.keysList = this.props.keysList;
+      this.valuesList = this.props.valuesList;
+      this.category = this.props.category;
+      this.state = {
+        required: 366,
+        data: [
+          {key:'366', value:'All'},
+          {key:'7', value:'1 week'},
+          {key:'30', value:'1 month'},
+          {key:'90', value:'3 months'},
+          {key:'180', value:'6 months'},
+          {key:'365', value:'1 year'},
+      ],
+      tableHead : ['Name', 'Quantity', this.category, 'date'],
+      widthArr : [110, 70, 70, 140],
+      values: sort([...this.keysList], [...this.valuesList], 366)[1],
 
-    //dropdown menu to select time period
-    const [required, setRequired] = React.useState(366);
-    
-    const data = [
-        {key:'366', value:'All'},
-        {key:'7', value:'1 week'},
-        {key:'30', value:'1 month'},
-        {key:'90', value:'3 months'},
-        {key:'180', value:'6 months'},
-        {key:'365', value:'1 year'},
-    ]
-    tableHead = ['Name', 'Quantity', category, 'date']
-    widthArr = [110, 70, 70, 140]
-    const tableData = [];
-    orderedList = sort([...keysList], [...valuesList], required)[1]
-    const [values, setValues] = React.useState(orderedList);
-
-    const handleFilter = (requiredInterval) => {
-        setRequired(requiredInterval)
-        // orderedLists = sort(keysList, valuesList, requiredInterval)
-        setValues(orderedList)
+      }
     }
 
+    handleFilter = (requiredInterval) => {
+      orderedLists = sort([...this.keysList], [...this.valuesList], requiredInterval)
+      this.setState({values: orderedLists[1]})
+  }
+    
+    render() {
+    const tableData = [];
 
-    values.forEach(values => {
+    this.state.values.forEach(values => {
         let valuesList = Object.values(values)
         let keyList = Object.keys(values)
         for (i=0; i < keyList.length; i++){
             let rowData = []
             rowData.push(keyList[i])
             rowData.push(valuesList[i].quantity)
-            rowData.push(valuesList[i][category])
+            rowData.push(valuesList[i][this.category])
             rowData.push(valuesList[i].dateUI)
             tableData.push(rowData)
         }
         tableData.push([' ', ' ', ' ', ' '])
     })
-
+  
 
     return (
         <View>
@@ -75,14 +80,15 @@ export const PresentData = ({keysList, valuesList, category}) => {
             </ScrollView>
             <View style={{zIndex: 1, width: '40%', padding: 20, position: 'relative'}}>
                 <SelectList 
-                    setSelected={(val) => handleFilter(val)} 
-                    data={data} 
+                    setSelected={(val) => this.handleFilter(val)} 
+                    data={this.state.data} 
                     save="key"
                     searchPlaceholder="Filter"
                 />
             </View>
         </View>
     )
+}
 }
 
 const styles = StyleSheet.create({

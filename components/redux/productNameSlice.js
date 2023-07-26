@@ -32,7 +32,6 @@ export const productNamesSlice = createSlice({
             action.payload format
             "1234":"music",
             */
-            console.log(state.value);
             state.value = addToInventory(state.value, action.payload);
         },
     }

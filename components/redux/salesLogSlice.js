@@ -106,8 +106,6 @@ export default salesLogSlice.reducer
 
 const addToInventory = ( state, item) => {
     i = item.date;
-    console.log(state)
     j = {...state, ...item}
-    console.log(j)
     return j
 };

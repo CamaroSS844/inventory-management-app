@@ -31,8 +31,7 @@ export const check = <MaterialIcons name="check-circle" size={20} color={"white"
 //inventory app
 
 export const checkFields = (obj, successFunc) => {
-  isComplete = true; 
-  console.log(obj)
+  isComplete = true;
   Object.values(obj).forEach(function(val){
     if(val === ""){
       isComplete = false;

@@ -21,7 +21,7 @@ const chartConfig = {
   useShadowColorFromDataset: false // optional
 };
 
-const SalesBarGraph = ({keys, values, names}) => {
+const BarGraphs = ({keys, values, names}) => {
   list = sortFuncForReports(keys, values, 30)
   label = [];
   info = []
@@ -40,34 +40,7 @@ const SalesBarGraph = ({keys, values, names}) => {
   return (
     <BarChart
       data={data}
-      width={screenWidth}
-      height={230}
-      yAxisLabel=" "
-      chartConfig={chartConfig}
-      verticalLabelRotation={0}
-    />
-  )
-}
-const removalsBarGraph = ({keys, values, names}) => {
-  list = sortFuncForReports(keys, values, 30)
-  label = [];
-  info = []
-  list[1].forEach(val => {
-    Object.keys(val).forEach(val => label.push(names[val]))
-    Object.values(val).forEach(val => info.push(parseInt(val.quantity)))
-  })
-  data = {
-    labels: label,
-    datasets: [
-      {
-        data: info,
-      }
-    ]
-  };
-  return (
-    <BarChart
-      data={data}
-      width={screenWidth}
+      width={screenWidth/1.1}
       height={230}
       yAxisLabel=" "
       chartConfig={chartConfig}
@@ -172,9 +145,9 @@ class ReportSummary extends React.Component {
                   <Text style={{padding: 20}}>Summary of Transactions for the last 30 days</Text>
 
                   <Text style={{padding: 20}}>Sales summary</Text>
-                  <SalesBarGraph keys={[...Object.keys(this.props.sales)]}  values={[...Object.values(this.props.sales)]} names={{...this.props.productName}}/>
+                  <BarGraphs keys={[...Object.keys(this.props.sales)]}  values={[...Object.values(this.props.sales)]} names={{...this.props.productName}}/>
                   <Text style={{padding: 20}}>Damaged and Expired goods</Text>
-                  <SalesBarGraph keys={[...Object.keys(this.props.removals)]}  values={[...Object.values(this.props.removals)]} names={{...this.props.productName}}/>
+                  <BarGraphs keys={[...Object.keys(this.props.removals)]}  values={[...Object.values(this.props.removals)]} names={{...this.props.productName}}/>
 
                 </View>
                 </ScrollView>

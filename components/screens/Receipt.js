@@ -28,7 +28,6 @@ class Receipt extends React.Component {
       let payload = {}
       date = moment().format()
       this.cart.forEach((item) => {
-        console.log(item);
         payload = {[date]: {
           ...payload[date],
           [item.barcodeNumber]: {
@@ -37,7 +36,6 @@ class Receipt extends React.Component {
           totalValue: item.pricePerUnit*item.quantity
         }}}
       })
-      console.log(payload);
       this.props.logNewSale(payload)
     }
 

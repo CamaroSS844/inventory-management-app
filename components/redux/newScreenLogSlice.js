@@ -77,7 +77,6 @@ export const stockingLogSlice = createSlice({
               },
             }
             */
-           console.log(action.payload);
             state.value = addToInventory(state.value, action.payload);
         },
     }

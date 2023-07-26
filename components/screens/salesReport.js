@@ -11,7 +11,6 @@ class SalesReport extends React.Component {
         this.valueslist = Object.values(this.props.sales);
     }
     render(){
-        console.log('sales screen')
         return (
             <View style={styles.Container}>
                 <View style={styles.main}>

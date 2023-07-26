@@ -38,7 +38,6 @@ export default sort = (dates, values, requirement) => {
     requirement = parseInt(requirement)
     a = moment()
     datesDiffArr = []
-    console.log(dates)
 
     for(i = 0; i < dates.length; i++){
         val = a.diff(dates[i], 'days');
@@ -56,7 +55,6 @@ export default sort = (dates, values, requirement) => {
             i--;
         }
     }
-    console.log(datesDiffArr)
     for(i = 0; i < datesDiffArr.length; i++){
       if (datesDiffArr[i] == datesDiffArr[i+1]){
         datesDiffArr[i+1] += 0.1;

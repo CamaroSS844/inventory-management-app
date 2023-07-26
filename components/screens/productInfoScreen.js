@@ -11,7 +11,6 @@ class InfoScreen extends React.Component {
         this.props.route.params
         name, unit price, quantity, total ,date, barcode 
         */
-       console.log(this.props.route.params.info)
 
         this.barcodeNumber = this.props.route.params.info;
         this.productName = this.props.inventory[this.barcodeNumber].productName.toUpperCase();
