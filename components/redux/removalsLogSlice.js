@@ -50,6 +50,32 @@ const initialState = {
           reason: "eaten by rats"
         }
       }, 
+      "2023-07-14": {
+        "12345":{
+          dateUI: "14th July 2023, 2:41:42 pm",
+          quantity: "25",
+          category: "expired",
+          reason: "neglected"
+        },
+        "1234567":{ 
+          dateUI: "14th July 2023, 2:41:42 pm",
+          quantity: "5",
+          category: "damaged",
+          reason: "during delivery"
+        },
+        "1234567890": { 
+          dateUI: "14th July 2023, 2:41:42 pm",
+          quantity: "10",
+          category: "damaged",
+          reason: "eaten by rats"
+        },
+        "123456":{
+          dateUI: "14th March 2023, 2:42:03 pm",
+          quantity: "18",
+          category: "expired",
+          reason: "it was old"
+        }
+      }, 
       "2023-03-14": {
         "123456":{
           dateUI: "14th March 2023, 2:42:03 pm",

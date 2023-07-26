@@ -55,7 +55,7 @@ const initialState = {
         "1234567":{ 
           dateUI: "14th July 2023, 2:41:42 pm",
           quantity: "2",
-          totalValue: "2"
+          totalValue: "30"
         },
         "1234567890": { 
           dateUI: "14th July 2023, 2:41:42 pm",

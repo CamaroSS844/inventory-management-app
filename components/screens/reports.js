@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet, Dimensions } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { connect } from "react-redux";
 import {
   LineChart,
@@ -22,6 +22,33 @@ const chartConfig = {
 };
 
 const SalesBarGraph = ({keys, values, names}) => {
+  list = sortFuncForReports(keys, values, 30)
+  label = [];
+  info = []
+  list[1].forEach(val => {
+    Object.keys(val).forEach(val => label.push(names[val]))
+    Object.values(val).forEach(val => info.push(parseInt(val.quantity)))
+  })
+  data = {
+    labels: label,
+    datasets: [
+      {
+        data: info,
+      }
+    ]
+  };
+  return (
+    <BarChart
+      data={data}
+      width={screenWidth}
+      height={230}
+      yAxisLabel=" "
+      chartConfig={chartConfig}
+      verticalLabelRotation={0}
+    />
+  )
+}
+const removalsBarGraph = ({keys, values, names}) => {
   list = sortFuncForReports(keys, values, 30)
   label = [];
   info = []
@@ -127,23 +154,30 @@ class ReportSummary extends React.Component {
 
         return (
             <View style={styles.Container}>
+              <ScrollView style={{flex: 1}}>
                 <View style={styles.main}>
-                <Text style={{paddingTop: 20}}>Overall stock</Text>
-                <PieChart
-                  data={data}
-                  width={300}
-                  height={120}
-                  chartConfig={chartConfig}
-                  accessor={"population"}
-                  backgroundColor={"transparent"}
-                  paddingLeft={"5"}
-                  center={[0, 5]}
-                  absolute
-                />
-                <Text style={{padding: 20}}>Sales summary</Text>
-                <SalesBarGraph keys={[...Object.keys(this.props.sales)]}  values={[...Object.values(this.props.sales)]} names={{...this.props.productName}}/>
+                  <Text style={{paddingTop: 20}}>Overall stock</Text>
+                  <PieChart
+                    data={data}
+                    width={300}
+                    height={120}
+                    chartConfig={chartConfig}
+                    accessor={"population"}
+                    backgroundColor={"transparent"}
+                    paddingLeft={"5"}
+                    center={[0, 5]}
+                    absolute
+                  />
+
+                  <Text style={{padding: 20}}>Summary of Transactions for the last 30 days</Text>
+
+                  <Text style={{padding: 20}}>Sales summary</Text>
+                  <SalesBarGraph keys={[...Object.keys(this.props.sales)]}  values={[...Object.values(this.props.sales)]} names={{...this.props.productName}}/>
+                  <Text style={{padding: 20}}>Damaged and Expired goods</Text>
+                  <SalesBarGraph keys={[...Object.keys(this.props.removals)]}  values={[...Object.values(this.props.removals)]} names={{...this.props.productName}}/>
 
                 </View>
+                </ScrollView>
             </View>
         )
     }
