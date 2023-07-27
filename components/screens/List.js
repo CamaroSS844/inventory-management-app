@@ -52,7 +52,7 @@ class LoginScreen extends React.Component {
                         <TextInput
                           style={styles.input}
                           placeholder="Enter your full name"
-                          placeholderTextColor="black"
+                          placeholderTextColor="grey"
                           editable={true}
                           value={this.state.name}
                           onChangeText={(name) => this.setState({ name })}
@@ -60,7 +60,7 @@ class LoginScreen extends React.Component {
                         <TextInput
                           style={styles.input}
                           placeholder="New password"
-                          placeholderTextColor={"black"}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           secureTextEntry={true}
                           value={this.state.newPassword}
@@ -69,7 +69,7 @@ class LoginScreen extends React.Component {
                         <TextInput
                           style={styles.input}
                           placeholder="Confirm Password"
-                          placeholderTextColor={"black"}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           secureTextEntry={true}
                           value={this.state.confirmPassword}
@@ -78,7 +78,7 @@ class LoginScreen extends React.Component {
                         <TextInput
                           style={styles.input}
                           placeholder="Add branch name"
-                          placeholderTextColor={"black"}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.branch}
                           keyboardType={"visible-password"}

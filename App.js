@@ -14,6 +14,7 @@ import InventoryTable from './components/screens/viewInventory';
 import RemoveProduct from './components/screens/removeStock';
 import InfoScreen from './components/screens/productInfoScreen';
 import Reports from './components/screens/reportLand';
+import BarcodeScreen from './components/screens/barcodeScanning';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +23,7 @@ export default function App() {
     <NavigationContainer>
       <Provider store={store}>
         <Stack.Navigator>
-          <Stack.Screen name="my Todos" component={List} />
+          <Stack.Screen name="sign up" component={List} />
           <Stack.Screen name="sign in" component={LoginScreen} />
           <Stack.Screen name="my details" component={Details} />
           <Stack.Screen name="new Product" component={AddNewProduct} />
@@ -33,6 +34,7 @@ export default function App() {
           <Stack.Screen name="remove product" component={RemoveProduct} />
           <Stack.Screen name="reports" component={Reports} />
           <Stack.Screen name="prod info" component={InfoScreen} />
+          <Stack.Screen name="BarcodeScreen" component={BarcodeScreen} />
         </Stack.Navigator>
       </Provider>
       <FlashMessage position="top" />

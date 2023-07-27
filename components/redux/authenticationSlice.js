@@ -18,9 +18,10 @@ const initialState = {
         },
         "Morgan": {
           password: "executive2",
-          branch: "SouthWold"
+          branch: "BradField"
         },
-        ActiveAccount: 'none'//by default no account is active
+        ActiveAccount: 'none',//by default no account is active
+        Branches: ["SouthWold", "BradField"]
     }
   }
 
@@ -38,6 +39,7 @@ export const accountsSlice= createSlice({
             } 
             */
             state.value = addNew(state.value, action.payload);
+            state.value.Branches = [...state.value.Branches, action.payload[Object.keys(action.payload)[0]].branch]
         },
         updateActiveAccount: (state = {}, action) => {
             /**

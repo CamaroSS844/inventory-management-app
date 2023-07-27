@@ -58,7 +58,7 @@ class LoginScreen extends React.Component {
                     <TextInput
                           style={{...styles.input, borderWidth: this.state.userBW}}
                           placeholder="Enter your full name"
-                          placeholderTextColor="black"
+                          placeholderTextColor="grey"
                           editable={true}
                           value={this.state.name}
                           onChangeText={(name) => this.setState({ name })}
@@ -66,7 +66,7 @@ class LoginScreen extends React.Component {
                         <TextInput
                           style={{...styles.input, borderWidth: this.state.passBW}}
                           placeholder="Enter your password"
-                          placeholderTextColor={"black"}
+                          placeholderTextColor={"grey"}
                           editable={true}
                           value={this.state.password}
                           secureTextEntry={!this.state.passwordVisible}
@@ -79,9 +79,13 @@ class LoginScreen extends React.Component {
                         <Text style={styles.item}>Login</Text>
                     </TouchableOpacity>
                     <View>
-                    <Pressable onPress={() => {this.props.navigation.push("sign in")}}>
-                            <Text style={{color: "#476C6C", fontWeight: "bold", fontSize: 15, paddingTop: 20}}>
-                                Forgot password?
+                    <Pressable style={styles.para}
+                    onPress={() => {this.props.navigation.replace("sign up")}}>
+                            <Text>
+                            Don't have an account? 
+                            </Text>
+                            <Text style={{color: "#476C6C", fontWeight: "bold", fontSize: 15}}>
+                                {'  '}Sign up
                             </Text>
                         </Pressable>
                     </View>
@@ -149,7 +153,8 @@ const styles = StyleSheet.create({
     para: {
         display: "flex",
         flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+        paddingTop: 20
     }
 })
 

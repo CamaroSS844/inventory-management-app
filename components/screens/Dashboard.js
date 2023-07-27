@@ -1,10 +1,12 @@
-import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet } from "react-native";
-import React from "react"
+import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
+import React from "react";
+import { updateActiveAccount } from "../redux/authenticationSlice";
+import { connect } from "react-redux";
 import { FontAwesome5, FontAwesome, MaterialCommunityIcons, Ionicons} from "@expo/vector-icons";
 
 const processSale = <FontAwesome5 name="hand-holding-usd" size={60} />
 const viewInventory = <MaterialCommunityIcons name="archive-search-outline" size={60} />
-const account = <MaterialCommunityIcons name="account-circle" size={50} />
+const account = <MaterialCommunityIcons name="account-circle" size={50}/>
 const newStock = <MaterialCommunityIcons name="archive-plus-outline" size={60} />
 const transferStock = <MaterialCommunityIcons name="archive-arrow-up-outline" size={63} />
 const removeStock = <FontAwesome name="trash-o" size={60} />
@@ -12,22 +14,51 @@ const reports = <Ionicons name="document-text-outline" size={60} />
 
 
 //inventory app
-export default class DashboardScreen extends React.Component {
+class DashboardScreen extends React.Component {
     constructor(props){
         super(props);
+        this.Account = this.props.authenticate.ActiveAccount;
     }
+
+    popUP = () => {
+        Alert.alert(
+          `Log out of ${this.Account} `,
+          "  ",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Confirm",
+              onPress: () => {
+                this.props.navigation.replace('sign in');
+              },
+            },
+          ]
+        );
+    }
+    
     render(){
         return (
             <View style={styles.Container}>
-                <View style={{display: "flex", flexDirection: "row"}}>
+
+                <Pressable 
+                    style={{display: "flex", 
+                        flexDirection: "row", 
+                        paddingBottom: 50, 
+                        paddingLeft: 40,
+                        alignItems: "center",
+                        justifyContent: "space-evenly",
+                        width: "50%",
+                    }} 
+                    onPress={() => this.popUP()}
+                >
                     <Pressable>
                     {account}
                     </Pressable>
-                    <View>
-                        <Text>Trinity Cacciola</Text>
-                        <Text>Phelandaba</Text>
+                    <View style>
+                        <Text>{this.Account}</Text>
+                        <Text>{this.props.authenticate[this.Account].branch}</Text>
                     </View>
-                </View>
+                </Pressable>
                 <View style={styles.main}>
                     <View style={styles.div}>
                         <Pressable onPress={() => this.props.navigation.push("ProcessSale")}>
@@ -69,6 +100,21 @@ export default class DashboardScreen extends React.Component {
         )
     }
 }
+
+const mapStateToProps = state => ({
+    inventory: state.inventoryList.value,
+    sales: state.salesLog.value,
+    authenticate: state.accounts.value
+  })
+  
+  const mapDispatchToProps = () => ({
+    updateActiveAccount
+  })
+  
+  export default connect(
+    mapStateToProps,
+    mapDispatchToProps()
+  )(DashboardScreen)
 
 const styles = StyleSheet.create({
     Container: {
