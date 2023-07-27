@@ -1,8 +1,13 @@
 import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet } from "react-native";
+import { connect } from "react-redux";
+import { newAccount, updateActiveAccount } from "../redux/authenticationSlice";
+import { showMessage } from "react-native-flash-message";
+import { cancel, check, checkFields } from "./newProduct";
 import React from "react"
 
+
 //inventory app
-export default class LoginScreen extends React.Component {
+class LoginScreen extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -10,6 +15,32 @@ export default class LoginScreen extends React.Component {
             newPassword: "",
             confirmPassword: "",
             branch: ""
+        }
+    }
+
+    handleRegister = (obj) => {
+        if(this.state.newPassword === this.state.confirmPassword){
+            this.props.newAccount({
+                [this.state.name]: {password: this.state.newPassword, branch: this.state.branch}
+            })
+            showMessage({
+                message: `  Account created`,
+                type: "success",
+                autoHide: true,
+                duration: 2000,
+                icon: () => check
+            })
+            this.props.updateActiveAccount(this.state.name)
+            this.setState({name: "", newPassword: "", confirmPassword: "", branch: ""}) 
+            this.props.navigation.push("Dashboard")
+        }else{
+            showMessage({
+                message: `  Passwords don't match`,
+                type: "danger",
+                autoHide: true,
+                duration: 2000,
+                icon: () => cancel
+              })
         }
     }
 
@@ -54,7 +85,9 @@ export default class LoginScreen extends React.Component {
                           onChangeText={(branch) => this.setState({ branch })}
                         />
                     </View>
-                    <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.push("Dashboard")}}>
+                    <TouchableOpacity style={styles.button} onPress={() => {
+                        checkFields({...this.state}, this.handleRegister)
+                        }}>
                         <Text style={styles.item}>Register</Text>
                     </TouchableOpacity>
                     <View style={styles.para}>
@@ -73,19 +106,21 @@ export default class LoginScreen extends React.Component {
 
 
 
-//fireapp
-// import { View, Text, Button } from "react-native";
-// import React from "react"
-// export default List = (props) => {
-//     return (
-//         <View>
-//             <Text>List</Text>
-//             <Button onPress={() => props.navigation.push("my details")}
-//             title="open Details"
-//             />
-//         </View>
-//     )
-// }
+const mapStateToProps = state => ({
+    inventory: state.inventoryList.value,
+    sales: state.salesLog.value,
+    authenticate: state.accounts.value
+  })
+  
+  const mapDispatchToProps = () => ({
+    newAccount,
+    updateActiveAccount
+  })
+  
+  export default connect(
+    mapStateToProps,
+    mapDispatchToProps()
+  )(LoginScreen)
 
 
 const styles = StyleSheet.create({

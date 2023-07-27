@@ -4,6 +4,7 @@ import salesLogReducer from "./salesLogSlice";
 import removalsLogReducer from "./removalsLogSlice";
 import newScreenLogReducer from "./newScreenLogSlice";
 import productNameReducer from "./productNameSlice";
+import accountsReducer from "./authenticationSlice";
 
 export const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ export const store = configureStore({
         salesLog: salesLogReducer,
         removalsLog: removalsLogReducer,
         stockingLog: newScreenLogReducer,
-        productLog: productNameReducer
+        productLog: productNameReducer,
+        accounts: accountsReducer
     }
 }) 
 

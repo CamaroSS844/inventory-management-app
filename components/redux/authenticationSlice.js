@@ -1,70 +1,62 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 /*
-
-sales slice: {
-  17june2022: {
-    1234567890:{
-      quantity: 20, 
-      totalValue: 200,
-    }
-  },
+second account
+Fernandez Torres:{
+       password: "executive1",
+       branch: "SouthWold"
 }
-
-stock added 
-sales
-stock removed
-adjustable intervals, daily weekly, monthly
-display monthly graphs or 
 */
 
 
 
 const initialState = {
     value: {
-        "Trinity Cacciola": {
-            password: "Maboy",
-        }
+        "Fernandez Torres": {
+          password: "executive1",
+          branch: "SouthWold"
+        },
+        "Morgan": {
+          password: "executive2",
+          branch: "SouthWold"
+        },
+        ActiveAccount: 'none'//by default no account is active
     }
   }
 
 
-export const removalsLogSlice = createSlice({
-    name: 'removalsLog',
+export const accountsSlice= createSlice({
+    name: 'accountsS',
     initialState,
     reducers: {
-        logNewRemoval: (state = {}, action) => {
+        newAccount: (state = {}, action) => {
             /*
             action.payload format
-            "2023-07-14": {
-              "12345":{
-                dateUI: "14th July 2023, 2:41:42 pm",
-                quantity: "10",
-                category: "damaged",
-                reason: "fell off the shelf"
-              },
-              "1234567":{ 
-                dateUI: "14th July 2023, 2:41:42 pm",
-                quantity: "2",
-                category: "expired",
-                reason: "spent too long in the freezer"
-              },
-            }
+            Fernandez Torres:{
+              password: "executive1",
+              branch: "SouthWold"
+            } 
             */
-            state.value = addToInventory(state.value, action.payload);
+            state.value = addNew(state.value, action.payload);
         },
+        updateActiveAccount: (state = {}, action) => {
+            /**
+             * action.payload format
+             * "Fernandez Torres"
+             */
+            state.value.ActiveAccount = action.payload
+        }
     }
 })
 
 
-export const { logNewRemoval } = removalsLogSlice.actions
+export const { updateActiveAccount, newAccount } = accountsSlice.actions
+export default accountsSlice.reducer
 
-export default removalsLogSlice.reducer
-
-const addToInventory = ( state, item) => {
-    dateId  = Object.keys(item)[0]
-    if(dateId in state){
-        state[dateId] = {...state[dateId], ...item[dateId]}
+ const addNew = ( state, item) => {
+    accountId  = Object.keys(item)[0]
+    if(accountId in state){
+        state[accountId] = {...state[accountId], ...item[accountId]}
         return state
     }
     return {...state, ...item}

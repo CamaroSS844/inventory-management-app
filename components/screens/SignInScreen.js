@@ -1,13 +1,52 @@
 import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet } from "react-native";
-import React from "react"
+import { connect } from "react-redux";
+import { unlockApp, updateActiveAccount } from "../redux/authenticationSlice";
+import React from "react";
+import { showMessage } from "react-native-flash-message";
+import { Entypo } from "@expo/vector-icons";
+import { cancel } from "./newProduct";
+
+
 
 //inventory app
-export default class LoginScreen extends React.Component {
+class LoginScreen extends React.Component {
     constructor(props){
         super(props);
         this.state = {
             name: "",
             password: "",
+            passwordVisible: false,
+            passBW: 0,
+            userBW: 0
+        }
+    }
+
+    handleLogin = () => {
+        if(this.props.authenticate[this.state.name]){
+            if(this.props.authenticate[this.state.name].password === this.state.password){
+                this.setState({passBW: 0, userBW: 0})
+                this.props.updateActiveAccount(this.state.name)
+                this.props.navigation.push("Dashboard")
+            }else{
+                showMessage({
+                    message: `  Wrong password`,
+                    type: "danger",
+                    autoHide: true,
+                    duration: 2000,
+                    icon: () => cancel
+                  })
+                  this.setState({passBW: 2})
+            }
+        }else{
+            showMessage({
+                message: `  Username ${this.state.name} not found`,
+                description: `  Please check your username and try again`,
+                type: "danger",
+                autoHide: true,
+                duration: 8000,
+                icon: () => cancel
+              })
+              this.setState({userBW: 2})
         }
     }
 
@@ -17,7 +56,7 @@ export default class LoginScreen extends React.Component {
             <View style={styles.main}>
                 <View style={{width: "100%", display: "flex", alignItems: "center"}}>
                     <TextInput
-                          style={styles.input}
+                          style={{...styles.input, borderWidth: this.state.userBW}}
                           placeholder="Enter your full name"
                           placeholderTextColor="black"
                           editable={true}
@@ -25,16 +64,18 @@ export default class LoginScreen extends React.Component {
                           onChangeText={(name) => this.setState({ name })}
                         />
                         <TextInput
-                          style={styles.input}
+                          style={{...styles.input, borderWidth: this.state.passBW}}
                           placeholder="Enter your password"
                           placeholderTextColor={"black"}
                           editable={true}
                           value={this.state.password}
-                          keyboardType={"visible-password"}
+                          secureTextEntry={!this.state.passwordVisible}
                           onChangeText={(password) => this.setState({ password })}
                         />
                     </View>
-                    <TouchableOpacity style={styles.button} onPress={() => {this.props.navigation.push("Dashboard")}}>
+                    <TouchableOpacity style={styles.button} onPress={() => {
+                        this.handleLogin()
+                        }}>
                         <Text style={styles.item}>Login</Text>
                     </TouchableOpacity>
                     <View>
@@ -49,6 +90,22 @@ export default class LoginScreen extends React.Component {
         )
     }
 }
+
+const mapStateToProps = state => ({
+    inventory: state.inventoryList.value,
+    sales: state.salesLog.value,
+    authenticate: state.accounts.value
+  })
+  
+  const mapDispatchToProps = () => ({
+    unlockApp,
+    updateActiveAccount
+  })
+  
+  export default connect(
+    mapStateToProps,
+    mapDispatchToProps()
+  )(LoginScreen)
 
 const styles = StyleSheet.create({
     Container: {
@@ -73,7 +130,8 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         width: "70%",
         padding: 10,
-        borderRadius: 20
+        borderRadius: 20, 
+        borderColor: "red"
     },
     button: {
         backgroundColor: "#476C6C",
