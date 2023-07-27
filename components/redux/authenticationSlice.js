@@ -1,55 +1,32 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 /*
-
-sales slice: {
-  17june2022: {
-    1234567890:{
-      quantity: 20, 
-      totalValue: 200,
-    }
-  },
-}
-
-stock added 
-sales
-stock removed
-adjustable intervals, daily weekly, monthly
-display monthly graphs or 
+second account
+Fernandez Torres:{
+       password: "executive1",
+       branch: "SouthWold"
 */
 
 
 
 const initialState = {
     value: {
-        "Trinity Cacciola": {
+        Fernandez Torres: {
             password: "Maboy",
+            branch: "Phelandaba"
         }
     }
   }
 
 
-export const removalsLogSlice = createSlice({
-    name: 'removalsLog',
+export const accountsSlice= createSlice({
+    name: 'accountsS',
     initialState,
     reducers: {
-        logNewRemoval: (state = {}, action) => {
+        newAccount: (state = {}, action) => {
             /*
             action.payload format
-            "2023-07-14": {
-              "12345":{
-                dateUI: "14th July 2023, 2:41:42 pm",
-                quantity: "10",
-                category: "damaged",
-                reason: "fell off the shelf"
-              },
-              "1234567":{ 
-                dateUI: "14th July 2023, 2:41:42 pm",
-                quantity: "2",
-                category: "expired",
-                reason: "spent too long in the freezer"
-              },
-            }
+            
             */
             state.value = addToInventory(state.value, action.payload);
         },
@@ -57,11 +34,9 @@ export const removalsLogSlice = createSlice({
 })
 
 
-export const { logNewRemoval } = removalsLogSlice.actions
+export const { logNewRemoval } = accountsSlice.actions
 
-export default removalsLogSlice.reducer
-
-const addToInventory = ( state, item) => {
+ const addNew = ( state, item) => {
     dateId  = Object.keys(item)[0]
     if(dateId in state){
         state[dateId] = {...state[dateId], ...item[dateId]}
