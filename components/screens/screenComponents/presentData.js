@@ -55,7 +55,7 @@ export class PresentData extends React.Component {
             <ScrollView horizontal={true}>
                 <View>
                   <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                    <Row data={tableHead} widthArr={widthArr} style={styles.header} textStyle={styles.text}/>
+                    <Row data={this.state.tableHead} widthArr={this.state.widthArr} style={styles.header} textStyle={styles.text}/>
                   </Table>
                   <ScrollView style={styles.dataWrapper}>
                     <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
@@ -66,7 +66,7 @@ export class PresentData extends React.Component {
                               <Row
                                 key={index}
                                 data={rowData}
-                                widthArr={widthArr}
+                                widthArr={this.state.widthArr}
                                 style={{...localStyle[0], ...localStyle[1]}}
                                 textStyle={{...styles.text}}
                               />
