@@ -31,8 +31,8 @@ export default class LoginScreen extends React.Component {
                           placeholder="New password"
                           placeholderTextColor={"black"}
                           editable={true}
+                          secureTextEntry={true}
                           value={this.state.newPassword}
-                          keyboardType={"visible-password"}
                           onChangeText={(newPassword) => this.setState({ newPassword })}
                         />
                         <TextInput
@@ -40,8 +40,8 @@ export default class LoginScreen extends React.Component {
                           placeholder="Confirm Password"
                           placeholderTextColor={"black"}
                           editable={true}
+                          secureTextEntry={true}
                           value={this.state.confirmPassword}
-                          keyboardType={"visible-password"}
                           onChangeText={(confirmPassword) => this.setState({ confirmPassword })}
                         />
                         <TextInput
