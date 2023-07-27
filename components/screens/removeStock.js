@@ -8,6 +8,7 @@ import { cancel, check } from "./newProduct";
 import { isInStock, checkFields } from "./newProduct";
 import { logNewRemoval } from "../redux/removalsLogSlice";
 import moment from "moment/moment";
+import { Pressable } from "react-native";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 
@@ -21,9 +22,11 @@ const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 class RemoveProduct extends React.Component {
     constructor(props){
         super(props);
+        this.check = isInStock(this.props.currentBarcode, this.props.inventory)
+
         this.state = {
-            barcodeNumber: "",
-            productName: "",
+            barcodeNumber: !this.check? "" : this.props.currentBarcode,
+            productName: !this.check? "": this.check.productName,
             quantity: "",//or all for every thing
             Reason: "",
             Category: "",
@@ -63,7 +66,7 @@ class RemoveProduct extends React.Component {
             category: "expired",
             reason: "spent too long in the freezer"
           },
-        }
+        } 
       */
       let payload = {};
       time = moment().format();
@@ -129,9 +132,12 @@ class RemoveProduct extends React.Component {
     render(){
         return (
           <View style={styles.Container}>
-                <View style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}>
+                <Pressable 
+                  style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
+                  onPress={() => this.props.navigation.push("BarcodeScreen")}
+                  >
                   {barcode}
-                </View>
+                </Pressable>
                 <View style={styles.main}>
                   <View style={{width: "100%", display: "flex", alignItems: "center"}}>
                        <TextInput
@@ -148,9 +154,9 @@ class RemoveProduct extends React.Component {
                         />
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter product name"
-                          placeholderTextColor={"grey"}
-                          editable={true}
+                          placeholder="Product name"
+                          placeholderTextColor={"black"}
+                          editable={false}
                           value={this.state.productName}
                           keyboardType={"visible-password"}
                           onChangeText={(productName) => this.setState({ productName })}
@@ -209,7 +215,8 @@ class RemoveProduct extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    inventory: state.inventoryList.value
+    inventory: state.inventoryList.value,
+    currentBarcode: state.currentBCS.value
   })
   
 const mapDispatchToProps = () => ({
@@ -246,7 +253,8 @@ const styles = StyleSheet.create({
       backgroundColor: "white",
       width: "70%",
       padding: 10,
-      borderRadius: 20
+      borderRadius: 20,
+      color: 'black'
   },
   button: {
       backgroundColor: "#476C6C",

@@ -11,10 +11,10 @@ available features on this screen are as follows
    if it dsplays current quantity ----> 20
    and you type in 23, total quantiy in the database becomes 43 not 23
  */
+ 
 
 
-
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { showMessage} from "react-native-flash-message";
@@ -67,15 +67,17 @@ class AddNewProduct extends React.Component {
         this.quantityPlMessage = "Enter quantity"
         this.minLevelPlMessage = "Enter minimum level"
         this.pricePlMessage = "Enter Price per unit"
+        this.check = isInStock(this.props.currentBarcode, this.props.inventory)
+
         this.state = {
-            barcodeNumber: "8990",
-            productName: "tree",
-            quantity: "45",
-            minLevel: "7",
-            pricePerUnit: "8",
-            quantityPlaceholder: this.quantityPlMessage,
-            minLevelPlaceholder: this.minLevelPlMessage,
-            pricePlaceholder: this.pricePlMessage,
+            barcodeNumber: !this.check? "" : this.props.currentBarcode,
+            productName: !this.check? "": this.check.productName,
+            quantity: "",
+            minLevel: "",
+            pricePerUnit: "",
+            quantityPlaceholder: !this.check? this.quantityPlMessage : `Items in stock ---> ${this.check.quantity}` ,
+            minLevelPlaceholder: !this.check? this.minLevelPlMessage : `Current minimum level ---> ${this.check.minLevel}`,
+            pricePlaceholder: !this.check? this.pricePlMessage: `Current price per unit ----> ${this.check.pricePerUnit}`,
             instock: false
         }
     }
@@ -163,9 +165,12 @@ class AddNewProduct extends React.Component {
     render(){
         return (
           <View style={styles.Container}>
-                <View style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}>
+                <Pressable 
+                style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
+                onPress={() => this.props.navigation.push("BarcodeScreen")}
+                >
                   {barcode}
-                </View>
+                </Pressable>
                 <View style={styles.main}>
                   <View style={{width: "100%", display: "flex", alignItems: "center"}}>
                         <TextInput
@@ -243,7 +248,8 @@ class AddNewProduct extends React.Component {
     }
 }
 const mapStateToProps = state => ({
-  inventory: state.inventoryList.value
+  inventory: state.inventoryList.value,
+  currentBarcode: state.currentBCS.value
 })
 
 const mapDispatchToProps = () => ({

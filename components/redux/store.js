@@ -5,6 +5,7 @@ import removalsLogReducer from "./removalsLogSlice";
 import newScreenLogReducer from "./newScreenLogSlice";
 import productNameReducer from "./productNameSlice";
 import accountsReducer from "./authenticationSlice";
+import currentBarcodeSlice from "./currentBarcodeSlice";
 
 export const store = configureStore({
     reducer: {
@@ -13,7 +14,8 @@ export const store = configureStore({
         removalsLog: removalsLogReducer,
         stockingLog: newScreenLogReducer,
         productLog: productNameReducer,
-        accounts: accountsReducer
+        accounts: accountsReducer,
+        currentBCS: currentBarcodeSlice
     }
 }) 
 

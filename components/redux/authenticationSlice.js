@@ -40,6 +40,7 @@ export const accountsSlice= createSlice({
             */
             state.value = addNew(state.value, action.payload);
             state.value.Branches = [...state.value.Branches, action.payload[Object.keys(action.payload)[0]].branch]
+            console.log(state.value.Branches)
         },
         updateActiveAccount: (state = {}, action) => {
             /**

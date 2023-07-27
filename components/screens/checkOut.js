@@ -17,17 +17,19 @@ class ProcessSale extends React.Component {
         super(props);
         this.pricePlMessage = "Enter Price per unit"
         this.quantityPlMessage = "Enter quantity"
+        this.check = isInStock(this.props.currentBarcode, this.props.inventory)
+
         this.state = {
-            barcodeNumber: "1234567890",
-            productName: "books",
-            quantity: "5",
+            barcodeNumber: !this.check? "" : this.props.currentBarcode,
+            productName: !this.check? "": this.check.productName,
+            quantity: "",
             pricePerUnit: "",
             instock: false,
-            pricePlaceholder: this.pricePlMessage,
-            quantityPlaceholder: this.quantityPlMessage,
+            pricePlaceholder: !this.check? this.pricePlMessage: `Current price per unit ----> ${this.check.pricePerUnit}`,
+            quantityPlaceholder: !this.check? this.quantityPlMessage : `Items in stock ---> ${this.check.quantity}`,
             cart: {}
         }
-    }
+    } 
     
 
     clear = () => {
@@ -145,7 +147,10 @@ class ProcessSale extends React.Component {
     render(){
         return (
           <View style={styles.Container}>
-                <View style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}>
+                <View 
+                  style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
+                  onPress={() => this.props.navigation.push("BarcodeScreen")}
+                >
                   {barcode}
                 </View>
                 <View style={styles.main}>
@@ -185,8 +190,8 @@ class ProcessSale extends React.Component {
                         <TextInput
                           style={styles.input}
                           placeholder={this.state.pricePlaceholder}
-                          placeholderTextColor={"grey"}
-                          editable={true}
+                          placeholderTextColor={"black"}
+                          editable={false}
                           value={this.state.pricePerUnit}
                           keyboardType={"numeric"}
                           onChangeText={(pricePerUnit) => this.setState({ pricePerUnit })}
@@ -216,7 +221,8 @@ class ProcessSale extends React.Component {
 
 
 const mapStateToProps = state => ({
-  inventory: state.inventoryList.value
+  inventory: state.inventoryList.value,
+  currentBarcode: state.currentBCS.value
 })
 
 const mapDispatchToProps = () => ({

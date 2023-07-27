@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import { useDispatch, useSelector } from 'react-redux';
+import { newBarcode } from '../redux/currentBarcodeSlice';
+import { BarCodeScanner } from 'expo-barcode-scanner'; 
+import { showMessage } from 'react-native-flash-message';
+import { check } from './newProduct';
 
 export default function BarcodeScreen({ navigation }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -18,6 +23,16 @@ export default function BarcodeScreen({ navigation }) {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    dispatch(newBarcode(data));
+    navigation.pop();
+    showMessage({
+      message: `Barcode ${data} scanned`,
+      description: `You can now add the product to the inventory`,
+      type: 'success',
+      autoHide: true,
+      duration: 5000,
+      icon: () => check,
+    });
   };
 
   if (hasPermission === null) {
