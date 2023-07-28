@@ -20,6 +20,10 @@ const initialState = {
           password: "executive2",
           branch: "BradField"
         },
+        "Nqobani": {
+          password: "project",
+          branch: "Havard"
+        },
         ActiveAccount: 'none',//by default no account is active
         Branches: ["SouthWold", "BradField"]
     }

@@ -17,7 +17,7 @@ class RestockingReport extends React.Component {
         return (
             <View style={styles.Container}>
                  <View style={styles.main}>
-                    <PresentData keysList={[...this.keyslist]} valuesList={[...this.valueslist]}  category={'category'}/>
+                    <PresentData keysList={[...this.keyslist]} valuesList={[...this.valueslist]} names ={{...this.props.productNames}} category={'category'}/>
                 </View>
             </View>
         )
@@ -28,6 +28,7 @@ class RestockingReport extends React.Component {
 const mapStateToProps = state => ({
     inventory: state.inventoryList.value,
     stockingLog: state.stockingLog.value,
+    productNames: state.productLog.value
 })
   
   const mapDispatchToProps = () => ({

@@ -14,7 +14,7 @@ class SalesReport extends React.Component {
         return (
             <View style={styles.Container}>
                 <View style={styles.main}>
-                    <PresentData keysList={[...this.keyslist]} valuesList={[...this.valueslist]}  category={'totalValue'}/>
+                    <PresentData keysList={[...this.keyslist]} names ={{...this.props.productNames}} valuesList={[...this.valueslist]}  category={'totalValue'}/>
                 </View>
             </View>
         )
@@ -23,7 +23,8 @@ class SalesReport extends React.Component {
 
 const mapStateToProps = state => ({
     inventory: state.inventoryList.value,
-    sales: state.salesLog.value
+    sales: state.salesLog.value,
+    productNames: state.productLog.value
   })
   
   const mapDispatchToProps = () => ({
