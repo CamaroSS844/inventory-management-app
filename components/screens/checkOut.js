@@ -6,6 +6,7 @@ import { remove } from "../redux/productsListSlice";
 import { check, isInStock } from "./newProduct";
 import { showMessage, hideMessage } from "react-native-flash-message";
 import { cancel } from "./newProduct";
+import { removeBarcode } from "../redux/currentBarcodeSlice";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 
@@ -20,7 +21,7 @@ class ProcessSale extends React.Component {
         this.check = isInStock(this.props.currentBarcode, this.props.inventory)
 
         this.state = {
-            barcodeNumber: !this.check? "" : this.props.currentBarcode,
+            barcodeNumber: !this.props.currentBarcode? "" : this.props.currentBarcode,
             productName: !this.check? "": this.check.productName,
             quantity: "",
             pricePerUnit: "",
@@ -105,6 +106,7 @@ class ProcessSale extends React.Component {
         this.setState({
           cart: {...this.state.cart, ...currentItem}})
         }
+        this.props.removeBarcode()
         this.clear()
         if(bool){
           return currentItem
@@ -149,7 +151,7 @@ class ProcessSale extends React.Component {
           <View style={styles.Container}>
                 <View 
                   style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
-                  onPress={() => this.props.navigation.push("BarcodeScreen")}
+                  onPress={() => this.props.navigation.push("BarcodeScreen", {id: "ProcessSale"})}
                 >
                   {barcode}
                 </View>
@@ -226,7 +228,8 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = () => ({
-  remove
+  remove,
+  removeBarcode
 })
 
 export default connect(

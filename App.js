@@ -15,6 +15,7 @@ import RemoveProduct from './components/screens/removeStock';
 import InfoScreen from './components/screens/productInfoScreen';
 import Reports from './components/screens/reportLand';
 import BarcodeScreen from './components/screens/barcodeScanning';
+import transferStock from './components/screens/transferStock';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ export default function App() {
           <Stack.Screen name="reports" component={Reports} />
           <Stack.Screen name="prod info" component={InfoScreen} />
           <Stack.Screen name="BarcodeScreen" component={BarcodeScreen} />
+          <Stack.Screen name="Transfer" component={transferStock} />
         </Stack.Navigator>
       </Provider>
       <FlashMessage position="top" />

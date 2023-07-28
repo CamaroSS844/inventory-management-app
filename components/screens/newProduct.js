@@ -23,6 +23,7 @@ import { addNewProducts } from "../redux/productsListSlice";
 import { logStocking } from "../redux/newScreenLogSlice";
 import { logProduct } from "../redux/productNameSlice";
 import moment from "moment/moment";
+import { removeBarcode } from "../redux/currentBarcodeSlice";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 export const cancel = <MaterialIcons name="cancel" size={20} color={"white"}/>
@@ -70,7 +71,7 @@ class AddNewProduct extends React.Component {
         this.check = isInStock(this.props.currentBarcode, this.props.inventory)
 
         this.state = {
-            barcodeNumber: !this.check? "" : this.props.currentBarcode,
+            barcodeNumber: !this.props.currentBarcode? "" : this.props.currentBarcode,
             productName: !this.check? "": this.check.productName,
             quantity: "",
             minLevel: "",
@@ -153,6 +154,7 @@ class AddNewProduct extends React.Component {
       )
 
       this.logPrep()
+      this.props.removeBarcode()
 
       showMessage({
         message: "   Saved!",
@@ -167,7 +169,7 @@ class AddNewProduct extends React.Component {
           <View style={styles.Container}>
                 <Pressable 
                 style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
-                onPress={() => this.props.navigation.push("BarcodeScreen")}
+                onPress={() => this.props.navigation.push("BarcodeScreen", {id: "new Product"})}
                 >
                   {barcode}
                 </Pressable>
@@ -255,7 +257,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = () => ({
   addNewProducts,
   logStocking,
-  logProduct
+  logProduct,
+  removeBarcode
 })
 
 export default connect(

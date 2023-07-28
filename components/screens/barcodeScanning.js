@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet, Button, Pressable } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { newBarcode } from '../redux/currentBarcodeSlice';
 import { BarCodeScanner } from 'expo-barcode-scanner'; 
 import { showMessage } from 'react-native-flash-message';
 import { check } from './newProduct';
 
-export default function BarcodeScreen({ navigation }) {
+export default function BarcodeScreen({ navigation, route }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const dispatch = useDispatch();
@@ -24,7 +24,7 @@ export default function BarcodeScreen({ navigation }) {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     dispatch(newBarcode(data));
-    navigation.pop();
+    navigation.replace(route.params.id);
     showMessage({
       message: `Barcode ${data} scanned`,
       description: `You can now add the product to the inventory`,

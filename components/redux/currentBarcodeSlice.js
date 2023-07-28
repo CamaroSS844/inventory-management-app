@@ -8,7 +8,7 @@ second account
 
 
 const initialState = {
-    value: 'none'
+    value: '3935762003631'
   }
 
 
@@ -28,7 +28,7 @@ export const currentBCSlice= createSlice({
              * action.payload format
              * "Fernandez Torres"
              */
-            state.value = 'none'
+            state.value = false
         }
     }
 })

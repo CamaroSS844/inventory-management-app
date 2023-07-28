@@ -78,7 +78,7 @@ class DashboardScreen extends React.Component {
                             <Text style={{textAlign: "center"}}>Add new</Text>
                             <Text style={{textAlign: "center"}}>Stock</Text>
                         </Pressable>
-                        <Pressable >
+                        <Pressable onPress={() => this.props.navigation.push("Transfer")}>
                             {transferStock}
                             <Text style={{textAlign: "center"}}>Transfer</Text>
                             <Text style={{textAlign: "center"}}>Stock</Text>

@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
 import React from "react";
 import { connect } from "react-redux";
 import { showMessage, hideMessage } from "react-native-flash-message";
@@ -8,8 +8,9 @@ import { cancel, check } from "./newProduct";
 import { isInStock, checkFields } from "./newProduct";
 import { logNewRemoval } from "../redux/removalsLogSlice";
 import moment from "moment/moment";
-import { Pressable } from "react-native";
 import { removeBarcode } from "../redux/currentBarcodeSlice";
+import { Pressable } from "react-native";
+import { SelectList } from "react-native-dropdown-select-list";
 
 const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 
@@ -20,17 +21,17 @@ const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
 
 
 //inventory app
-class RemoveProduct extends React.Component {
+class TransferScreen extends React.Component {
     constructor(props){
         super(props);
         this.check = isInStock(this.props.currentBarcode, this.props.inventory)
+        this.branches = this.props.authenticate.Branches;
 
         this.state = {
             barcodeNumber: !this.props.currentBarcode? "" : this.props.currentBarcode,
             productName: !this.check? "": this.check.productName,
             quantity: "",//or all for every thing
-            Reason: "",
-            Category: "",
+            branch: "",
             instock: false
         }
     }
@@ -80,13 +81,13 @@ class RemoveProduct extends React.Component {
         }
       }
       this.props.logNewRemoval({...payload});
-      this.props.removeBarcode()
+      this.props.removeBarcode();
     }
 
     popUP = (obj) => {
         Alert.alert(
-          `Are you sure you want to remove `,
-          "this item",
+          `Are you sure you want to transfer ${this.state.productName} to ${this.state.branch}`,
+          " ",
           [
             { text: "Cancel", style: "cancel" },
             {
@@ -132,11 +133,27 @@ class RemoveProduct extends React.Component {
     }
 
     render(){
+        // data: [
+        //     {key:'366', value:'All'},
+        //     {key:'7', value:'1 week'},
+        //     {key:'30', value:'1 month'},
+        //     {key:'90', value:'3 months'},
+        //     {key:'180', value:'6 months'},
+        //     {key:'365', value:'1 year'},
+        // ]
+        data = []
+        for(i=0; i < this.branches.length; i ++){
+            data.push({key: `${i+1}`, value: this.branches[i]})
+        }
+
+
+
         return (
-          <View style={styles.Container}>
+          <ScrollView >
+            <View style={styles.Container}>
                 <Pressable 
                   style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
-                  onPress={() => this.props.navigation.push("BarcodeScreen", {id: "remove product"})}
+                  onPress={() => this.props.navigation.push("BarcodeScreen", {id : 'Transfer'})}
                   >
                   {barcode}
                 </Pressable>
@@ -173,33 +190,27 @@ class RemoveProduct extends React.Component {
                           keyboardType={"numeric"}
                           onChangeText={(quantity) => this.setState({ quantity })}
                         />
-                        <TextInput
-                          style={styles.input}
-                          placeholder="Category ~~ damaged / expired "
-                          placeholderTextColor={"grey"}
-                          editable={true}
-                          value={this.state.Category}
-                          keyboardType={"numeric"}
-                          onChangeText={(Category) => this.setState({ Category })}
-                        />
-                        <TextInput
-                          style={styles.input}
-                          placeholder=" Explain further "
-                          placeholderTextColor={"grey"}
-                          editable={true}
-                          value={this.state.Reason}
-                          keyboardType={"numeric"}
-                          onChangeText={(Reason) => this.setState({ Reason })}
-                        />
+
+                        <View style={{ 
+                            width: '85%', padding: 20,
+                            display: 'flex', justifyContent: 'center', 
+                            alignItems: 'center'}}>
+                            <SelectList 
+                                setSelected={(branch) => this.setState({branch})} 
+                                data={data} 
+                                save="value"
+                                searchPlaceholder="Filter"
+                                boxStyles={styles.input}
+                            />
+                        </View>
                     </View>
-                    <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly"}}>
+                    <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly", marginBottom: "20%"}}>
                       <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}} onPress={
                         () => {
                             this.setState({
                                 barcodeNumber: "",
                                 productName: "",
                                 quantity: "",
-                                Reason: ""
                             })
                         }}>
                           <Text style={{color: "white"}}>Clear</Text>
@@ -212,13 +223,15 @@ class RemoveProduct extends React.Component {
                     </View>
                 </View>
             </View>
+            </ScrollView>
         )
     }
 }
 
 const mapStateToProps = state => ({
     inventory: state.inventoryList.value,
-    currentBarcode: state.currentBCS.value
+    currentBarcode: state.currentBCS.value,
+    authenticate: state.accounts.value
   })
   
 const mapDispatchToProps = () => ({
@@ -230,7 +243,7 @@ const mapDispatchToProps = () => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps()
-)(RemoveProduct)
+)(TransferScreen)
 
 
 const styles = StyleSheet.create({
@@ -246,7 +259,7 @@ const styles = StyleSheet.create({
       alignItems: "center",
       backgroundColor: "#D9D9D9",
       width: "100%",
-      height: "78%",
+      height: "80%",
       borderTopRightRadius: 50,
       borderTopLeftRadius: 50,
       paddingTop: 70
