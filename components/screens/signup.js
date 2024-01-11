@@ -1,61 +1,53 @@
-import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet } from "react-native";
-import { connect } from "react-redux";
+import React, {useState} from "react";
+import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet, Alert,Dimensions } from "react-native";
+import {signInWithEmailAndPassword} from "firebase/auth";
+import { auth } from "../../config/firebase";
 import { newAccount, updateActiveAccount } from "../redux/authenticationSlice";
 import { showMessage } from "react-native-flash-message";
 import { cancel, check, checkFields } from "./newProduct";
-import React from "react"
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import WavyHeader from "./wavyHeader";
 
+const overallWidth = Dimensions.get('window').width;
 
 //inventory app
-class LoginScreen extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            name: "",
-            newPassword: "",
-            confirmPassword: "",
-            branch: ""
+export default function SignUp(props) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [branch, setBranch] = useState("");
+    const [passwordVisible, setPasswordVisible] = useState(false);
+
+    const onSignup = () => {
+        //added username which wasnt there in the tutorial
+        console.log(`email: ${email} and password: ${password}`);
+        if (email !== "" && password !== ""){
+            createUserWithEmailAndPassword(auth, email, password)
+                .then(() => console.log("Signup success"))
+                .catch((err) => {
+                    console.log(err.message);
+                    return Alert.alert("Signup error", err.message)}
+                    )
         }
     }
 
-    handleRegister = (obj) => {
-        if(this.state.newPassword === this.state.confirmPassword){
-            this.props.newAccount({
-                [this.state.name]: {password: this.state.newPassword, branch: this.state.branch}
-            })
-            showMessage({
-                message: `  Account created`,
-                type: "success",
-                autoHide: true,
-                duration: 2000,
-                icon: () => check
-            })
-            this.props.updateActiveAccount(this.state.name)
-            this.setState({name: "", newPassword: "", confirmPassword: "", branch: ""}) 
-            this.props.navigation.push("Dashboard")
-        }else{
-            showMessage({
-                message: `  Passwords don't match`,
-                type: "danger",
-                autoHide: true,
-                duration: 2000,
-                icon: () => cancel
-              })
-        }
-    }
-
-    render(){
         return (
             <View style={styles.Container}>
-                <View style={styles.main}>
-                    <View style={{width: "100%", display: "flex", alignItems: "center"}}>
+                <WavyHeader customStyles={styles.svgCurve} />
+                <View style={styles.headerContainer}>
+                    <Text style={styles.headerText}>Sign Up</Text>
+                </View>
+                <View style={{top: (Dimensions.get('window').height)/3}}>
+                    <View style={{width: "100%"}}>
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter your full name"
+                          placeholder="Enter your email"
                           placeholderTextColor="grey"
                           editable={true}
-                          value={this.state.name}
-                          onChangeText={(name) => this.setState({ name })}
+                          value={email}
+                          onChangeText={(name) => {
+                            setEmail(name );
+                        }
+                        }
                         />
                         <TextInput
                           style={styles.input}
@@ -63,37 +55,26 @@ class LoginScreen extends React.Component {
                           placeholderTextColor={"grey"}
                           editable={true}
                           secureTextEntry={true}
-                          value={this.state.newPassword}
-                          onChangeText={(newPassword) => this.setState({ newPassword })}
-                        />
-                        <TextInput
-                          style={styles.input}
-                          placeholder="Confirm Password"
-                          placeholderTextColor={"grey"}
-                          editable={true}
-                          secureTextEntry={true}
-                          value={this.state.confirmPassword}
-                          onChangeText={(confirmPassword) => this.setState({ confirmPassword })}
+                          value={password}
+                          onChangeText={(newPassword) => setPassword(newPassword )}
                         />
                         <TextInput
                           style={styles.input}
                           placeholder="Add branch name"
                           placeholderTextColor={"grey"}
                           editable={true}
-                          value={this.state.branch}
+                          value={branch}
                           keyboardType={"visible-password"}
-                          onChangeText={(branch) => this.setState({ branch })}
+                          onChangeText={(branch) => setBranch({ branch })}
                         />
                     </View>
-                    <TouchableOpacity style={styles.button} onPress={() => {
-                        checkFields({...this.state}, this.handleRegister)
-                        }}>
+                    <TouchableOpacity style={styles.button}  onPress={() => onSignup()}>
                         <Text style={styles.item}>Register</Text>
                     </TouchableOpacity>
                     <View style={styles.para}>
                         <Text>Already have an account  </Text>
-                        <Pressable onPress={() => {this.props.navigation.push("sign in")}}>
-                            <Text style={{color: "#476C6C", fontWeight: "bold", fontSize: 15}}>
+                        <Pressable onPress={() => {props.navigation.push("signIn")}}>
+                            <Text style={{color: "purple", fontWeight: "bold", fontSize: 15}}>
                                 Sign in
                             </Text>
                         </Pressable>
@@ -102,58 +83,32 @@ class LoginScreen extends React.Component {
             </View>
         )
     }
-}
-
-
-
-const mapStateToProps = state => ({
-    inventory: state.inventoryList.value,
-    sales: state.salesLog.value,
-    authenticate: state.accounts.value
-  })
-  
-  const mapDispatchToProps = () => ({
-    newAccount,
-    updateActiveAccount
-  })
-  
-  export default connect(
-    mapStateToProps,
-    mapDispatchToProps()
-  )(LoginScreen)
 
 
 const styles = StyleSheet.create({
     Container: {
-        backgroundColor: "#CF8DB9", 
-        height: "100%",
-        display: "flex",
-        justifyContent: "flex-end",
-        alignItems: "center"
-    },
-    main: {
-        display: "flex",
+        backgroundColor: '#f4f4f4',
+        width: overallWidth,
+        display: 'flex',
+        flex: 1,
         alignItems: "center",
-        backgroundColor: "#D9D9D9",
-        width: "100%",
-        height: "78%",
-        borderTopRightRadius: 50,
-        borderTopLeftRadius: 50,
-        paddingTop: 50
     },
     input : {
         marginBottom: 40,
-        backgroundColor: "white",
-        width: "70%",
+        width: overallWidth * 0.8,
         padding: 10,
-        borderRadius: 20
+        paddingLeft: 20,
+        borderRadius: 20, 
+        borderColor: "purple", 
+        borderWidth: 0, 
+        borderBottomWidth: 1
     },
     button: {
-        backgroundColor: "#476C6C",
+        backgroundColor: "purple",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        width: 90,
+        width: overallWidth * 0.8,
         height: 35,
         borderRadius: 15
 
@@ -164,7 +119,19 @@ const styles = StyleSheet.create({
     para: {
         display: "flex",
         flexDirection: "row",
-        alignItems: "center",
+        justifyContent: "center",
         paddingTop: 20
-    }
+    },
+    svgCurve: {
+        position: 'absolute',
+        width: Dimensions.get('window').width
+      },
+      headerText: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        // change the color property for better output
+        color: '#fff',
+        textAlign: 'center',
+        top: 70
+      }
 })
