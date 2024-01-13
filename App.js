@@ -5,6 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './config/firebase';
 import { StatusBar } from 'expo-status-bar';
+import { Provider } from 'react-redux';
+import { store } from './components/redux/store';
 
 
 //Screens
@@ -92,7 +94,9 @@ function RootNavigator(){
 export default function App() {
   return (
     <AuthUserProvider >
-    <RootNavigator />
+    <Provider store={store}>
+      <RootNavigator />
+    </Provider>
   </AuthUserProvider>
   );
 }

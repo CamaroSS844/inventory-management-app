@@ -1476,6 +1476,11 @@
   dependencies:
     cross-spawn "^7.0.3"
 
+"@expo/vector-icons@14.0.0":
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/@expo/vector-icons/-/vector-icons-14.0.0.tgz#48ce0aa5c05873b07c0c78bfe16c870388f4de9a"
+  integrity sha512-5orm59pdnBQlovhU9k4DbjMUZBHNlku7IRgFY56f7pcaaCnXq9yaLJoOQl9sMwNdFzf4gnkTyHmR5uN10mI9rA==
+
 "@expo/vector-icons@^13.0.0":
   version "13.0.0"
   resolved "https://registry.yarnpkg.com/@expo/vector-icons/-/vector-icons-13.0.0.tgz#e2989b85e95a82bce216f88cf8fb583ab050ec95"
@@ -6015,7 +6020,7 @@ prompts@^2.3.2, prompts@^2.4.0:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@*, prop-types@^15.8.1:
+prop-types@*, prop-types@^15.5.10, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -6191,6 +6196,13 @@ react-native-screens@~3.22.0:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
+
+react-native-side-menu-updated@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-side-menu-updated/-/react-native-side-menu-updated-1.3.2.tgz#81a31e526228e35f4b644ed64f9b85f4cf838b76"
+  integrity sha512-38MErOgwoUQdFY4IEIYAO+JokWk3hCOhqirqwWBBXqwgTD9qeezlv9eWEMBaDsQSk/iW+cqLPkAafOAWeSXCVw==
+  dependencies:
+    prop-types "^15.5.10"
 
 react-native-svg@13.9.0:
   version "13.9.0"
