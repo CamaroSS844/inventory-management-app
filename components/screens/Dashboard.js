@@ -13,7 +13,7 @@ const no_notif = <FontAwesome name="bell-o" size={23} color='#fff'/>
 const notif = <FontAwesome name="bell-" size={25} color='#fff'/>
 const viewInventory = <MaterialCommunityIcons name="archive-search-outline" size={30} />
 const newStock = <MaterialCommunityIcons name="archive-plus-outline" size={30} />
-const right = <MaterialCommunityIcons name="barcode-scan" size={30} />
+const barcode = <MaterialCommunityIcons name="barcode-scan" size={30} />
 const transfer = <MaterialCommunityIcons name="truck-delivery-outline" size={33} />
 
 function CustomHeader({dispatch}){
@@ -69,26 +69,26 @@ export default function DashboardScreen(props){
                 <ScrollView>{/*this is the item containing all the dashboard tiles*/}
                   <View style={{...styles.mainTiles, marginTop: 50}}>
 
-                    <Pressable style={styles.mainTileIcon}>
+                    <Pressable style={styles.mainTileIcon} onPress={() => props.navigation.push('Checkout')}>
                       <View style={{marginRight: 20, backgroundColor: '#ffbb00c2', padding: 15, borderRadius: 50}}>
                         {checkout}
                       </View>
                       <Text>Checkout</Text>
                     </Pressable>
                     <Pressable style={styles.mainTilebarcode}>
-                      {right}
+                      {barcode}
                     </Pressable>
                   </View>
 
                   <View style={styles.mainTiles}>
-                    <Pressable style={styles.mainTileIcon}>
+                    <Pressable style={styles.mainTileIcon} onPress={() => props.navigation.push('new Product')}>
                       <View style={{marginRight: 20, backgroundColor: '#098d7ed1', padding: 15, borderRadius: 50}}>
                         {newStock}
                       </View>
                       <Text>New Stock</Text>
                     </Pressable>
                     <Pressable style={styles.mainTilebarcode}>
-                      {right}
+                      {barcode}
                     </Pressable>
                   </View>
 
@@ -100,7 +100,7 @@ export default function DashboardScreen(props){
                       <Text>transfer Stock</Text>
                     </Pressable>
                     <Pressable style={styles.mainTilebarcode}>
-                      {right}
+                      {barcode}
                     </Pressable>
                   </View>
                   
@@ -112,7 +112,7 @@ export default function DashboardScreen(props){
                       <Text>View Inventory</Text>
                     </Pressable>
                     <Pressable style={styles.mainTilebarcode}>
-                      {right}
+                      {barcode}
                     </Pressable>
                   </View>
 

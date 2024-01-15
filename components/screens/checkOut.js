@@ -1,287 +1,182 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { connect } from "react-redux";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Pressable } from "react-native";
+import React, { useState } from "react";
+import { FontAwesome } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 import { remove } from "../redux/productsListSlice";
 import { check, isInStock } from "./newProduct";
 import { showMessage, hideMessage } from "react-native-flash-message";
 import { cancel } from "./newProduct";
 import { removeBarcode } from "../redux/currentBarcodeSlice";
+import WavyHeader from "./wavyHeader";
+import { ScrollView } from "react-native";
 
-const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
+const backIcon = <FontAwesome name="chevron-left" size={25} color="#fff"/>
+const sale = 'sale'
+const overallWidth = Dimensions.get('window').width;
 
+function IdGen(transact){
+  //generate ids for sales purchases and other transactions.
+  //will be worked on accordingly
+  //first 2 letters for company name id, next letter transact type then transact number
+  switch(transact){
+    case sale:
+      return 'COS001';
+    default:
+      return null
+  }
+}
+function CustomHeader(){
+
+  return (
+    <View style={styles.customHeader}>
+        <Pressable style={{padding: 20}}>
+          {backIcon}
+        </Pressable>
+        <Text style={{color: '#fff', fontSize: 20, fontWeight: '900', padding: 20}}>Checkout</Text>
+    </View>
+  )
+}
 
 
 //inventory app
-class ProcessSale extends React.Component {
-    constructor(props){
-        super(props);
-        this.pricePlMessage = "Enter Price per unit"
-        this.quantityPlMessage = "Enter quantity"
-        this.check = isInStock(this.props.currentBarcode, this.props.inventory)
+export default function Checkout(){
+    const [salesPerson, setSalesPerson] = useSelector(() =>  "");
+    const [customerName, setCustomerName] = useSelector(() => "");
+    const shoppingCart = [];
 
-        this.state = {
-            barcodeNumber: !this.props.currentBarcode? "" : this.props.currentBarcode,
-            productName: !this.check? "": this.check.productName,
-            quantity: "",
-            pricePerUnit: "",
-            instock: false,
-            pricePlaceholder: !this.check? this.pricePlMessage: `Current price per unit ----> ${this.check.pricePerUnit}`,
-            quantityPlaceholder: !this.check? this.quantityPlMessage : `Items in stock ---> ${this.check.quantity}`,
-            cart: {}
-        }
-    } 
     
-
-    clear = () => {
-      this.setState({
-        barcodeNumber: "",
-        productName: "",
-        quantity: "",
-        minLevel: "",
-        pricePerUnit: "",
-        pricePlaceholder: this.pricePlMessage,
-        quantityPlaceholder: this.quantityPlMessage,
-      })
-    }
-
-    preliminaryChecks(){
-      let barcod = this.state.barcodeNumber
-      quantity = parseInt(this.state.quantity)
-
-      //check if barcode exists in the database
-      if (!(this.state.barcodeNumber in this.props.inventory)){
-        showMessage({
-          message: `  Barcode ${this.state.barcodeNumber} does not exist`,
-          description: `  Check for any typos or rescan the barcode`,
-          type: "danger",
-          autoHide: true,
-          duration: 5000,
-          icon: () => cancel
-        });
-        return false
-      }
-      quantInStock = parseInt(this.props.inventory[barcod].quantity)
-
-      //check if quantity entered is in stock
-      if(quantity){
-        if (quantInStock >= quantity){
-
-          showMessage({
-            message: `  Success`,
-            type: "success",
-            autoHide: true,
-            duration: 2000,
-            icon: () => check
-          });
-          return true
-        }else if(quantInStock < quantity){
-          showMessage({
-            message: `  Not Enough ${this.state.productName} left in Stock`,
-            description: `  ${quantInStock} left`,
-            type: "warning",
-            autoHide: true,
-            duration: 5000,
-            icon: () => cancel
-          });
-          return false
-        }
-      }
-    }
-
-
-    nextItem = (bool) => {
-      //if pass then = true if failed  = false
-      passed = this.preliminaryChecks()
-      if (passed){
-        let barcod = this.state.barcodeNumber
-        currentItem = {};
-        currentItem[barcod] = {
-        barcodeNumber: barcod,
-        productName: this.state.productName,
-        quantity: this.state.quantity,
-        pricePerUnit: this.props.inventory[barcod].pricePerUnit,
-      };
-        list = this.state.cart
-        this.setState({
-          cart: {...this.state.cart, ...currentItem}})
-        }
-        this.props.removeBarcode()
-        this.clear()
-        if(bool){
-          return currentItem
-        }
-        return false
-      }
-
-      handleDone = () => {
-        value = false
-        if (this.state.barcodeNumber){
-          value = this.nextItem(true)
-        }
-        if (value)  this.props.navigation.push("Receipt", {cart: {...this.state.cart, ...value}})
-        else this.props.navigation.push("Receipt", {cart: this.state.cart})
-
-        this.clear()
-      }
-    
-
-    autofill = (barcode) => {
-      value = isInStock(barcode, this.props.inventory)
-      if(!value){
-        this.setState({
-          productName: "",
-          pricePlaceholder: this.pricePlMessage,
-          quantityPlaceholder: this.quantityPlMessage,
-          instock: false
-      })
-      this.setState({instock: value})
-      return null
-      }
-      this.setState({
-        productName: value.productName,
-        pricePlaceholder: `Price per unit ----> $${value.pricePerUnit}`,
-        quantityPlaceholder: `Items in stock ---> ${value.quantity}`,
-        instock: value
-      })
-    } 
-
-    render(){
         return (
           <View style={styles.Container}>
-                <View 
-                  style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
-                  onPress={() => this.props.navigation.push("BarcodeScreen", {id: "ProcessSale"})}
-                >
-                  {barcode}
-                </View>
+          <WavyHeader customStyles={styles.svgCurve}/>
+          <CustomHeader />
+          <ScrollView>
                 <View style={styles.main}>
-                  <View style={{width: "100%", display: "flex", alignItems: "center"}}>
+                  <Text style={{fontSize: 25,fontFamily: 'serif', paddingLeft: 10}}>Details</Text>
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter barcode number"
+                          placeholder="Sales Person"
                           placeholderTextColor="grey"
                           editable={true}
-                          value={this.state.barcodeNumber}
-                          onChangeText={(barcodeNumber) => {
-                            this.setState({ barcodeNumber });
-                            this.autofill(barcodeNumber);
+                          value={salesPerson}
+                          onChangeText={(name) => {
+                            setSalesPerson(name);
+                            //autofill(name);
                           }}
                         />
                        
                        <TextInput
                           style={styles.input}
-                          placeholder="Product name"
+                          placeholder="Customer Name"
                           placeholderTextColor={"grey"}
                           editable={true}
-                          value={this.state.productName}
+                          value={customerName}
                           keyboardType={"visible-password"}
-                          onChangeText={(productName) => this.setState({ productName })}
+                          onChangeText={(customer) => setCustomerName(customer)}
                         />
                         
                         
                         <TextInput
                           style={styles.input}
-                          placeholder={this.state.quantityPlaceholder}
-                          placeholderTextColor={"grey"}
-                          editable={true}
-                          value={this.state.quantity}
-                          keyboardType={"numeric"}
-                          onChangeText={(quantity) => this.setState({ quantity })}
+                          placeholder={``}
+                          placeholderTextColor={"#000"}
+                          editable={false}
+                          value={`Sales order ${IdGen(sale)}`}
                         />
                         <TextInput
                           style={styles.input}
-                          placeholder={this.state.pricePlaceholder}
                           placeholderTextColor={"black"}
                           editable={false}
-                          value={this.state.pricePerUnit}
+                          value={'12 Jan 2024'}
                           keyboardType={"numeric"}
-                          onChangeText={(pricePerUnit) => this.setState({ pricePerUnit })}
+                          onChangeText={() => ''}
                         />
                     </View>
-                    <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly"}}>
-                      <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}} onPress={() => {
-                        this.clear()
-                      }}>
-                          <Text style={{color: "white"}}>Clear</Text>
+                <View style={styles.main}>
+                  <Text style={{fontSize: 25,fontFamily: 'serif', paddingLeft: 10}}>Cart</Text>
+                      <TouchableOpacity style={styles.button}  onPress={() => null}>
+                          <Text style={styles.item}>+ Add Item</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.button} onPress={() => this.nextItem()}>
-                          <Text style={{color: "white"}}>Next item</Text>
-                      </TouchableOpacity>
+                       
+                      {
+                      shoppingCart.length > 0? 
+                        <Text>list items</Text>
+                        : 
+                        <View style={{width: "100%",display: 'flex'}}>
+                          <Text style={{fontSize: 24, color: "grey",fontStyle: "italic"}}>No items added</Text>
+                        </View>
+                      }
                     </View>
-                    <TouchableOpacity style={{...styles.button, marginTop: 20}} onPress={() => {
-                        this.handleDone()
-                    }
-                    }>
-                          <Text style={{color: "white"}}>Done</Text>
-                      </TouchableOpacity>
-                </View>
+                </ScrollView>
             </View>
         )
-    }
 }
-
-
-const mapStateToProps = state => ({
-  inventory: state.inventoryList.value,
-  currentBarcode: state.currentBCS.value
-})
-
-const mapDispatchToProps = () => ({
-  remove,
-  removeBarcode
-})
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps()
-)(ProcessSale)
-
 
 
 const styles = StyleSheet.create({
   Container: {
-      backgroundColor: "#CF8DB9", 
-      height: "100%",
-      display: "flex",
-      justifyContent: "flex-end",
-      alignItems: "center"
+    flex: 1,
+    backgroundColor: '#eeeeee',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  customHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: 100, 
+    width: "100%",
+    // padding: 30,
+    paddingTop: 30,
+    backgroundColor: '#520bb0'
   },
   main: {
-      display: "flex",
-      alignItems: "center",
-      backgroundColor: "#D9D9D9",
-      width: "100%",
-      height: "78%",
-      borderTopRightRadius: 50,
-      borderTopLeftRadius: 50,
-      paddingTop: 70
+    marginTop: 30,
+    backgroundColor: '#fff',
+    color: '#000',
+    width: overallWidth * 0.95,
+    display: 'flex',
+    justifyContent: 'flex-start',
+    padding: 15,
+    shadowColor: "#000",
+    elevation: 6,
+    borderRadius: 5
   },
   input : {
       marginBottom: 30,
-      backgroundColor: "white",
-      width: "70%",
+      width: "95%",
       padding: 10,
-      borderRadius: 20
+      borderRadius: 20,
+      borderBottomColor: 'purple',
+      borderBottomWidth: 1,
+      color: '#000'
   },
   button: {
-      backgroundColor: "#476C6C",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: 90,
-      height: 35,
-      borderRadius: 15
-
-  },
-  item: {
-      color: "white"
-  },
+    backgroundColor: "purple",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: overallWidth * 0.8,
+    height: 45,
+    borderRadius: 30,
+    marginBottom: 40,
+    marginTop: 20
+},
+item: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: 'bold'
+},
   para: {
       display: "flex",
       flexDirection: "row",
       alignItems: "center",
       paddingTop: 20
+  },
+  svgCurve: {
+    position: 'absolute',
+    width: Dimensions.get('window').width
   }
 })
+
 

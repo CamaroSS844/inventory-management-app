@@ -1,304 +1,258 @@
-/*
-the new products screen enters new products into database
-available features on this screen are as follows
-> you are able to scan or manually type the barcode into the input
-> as you type the barcode the system checks if there is another product
-   in the database with the same barcode. 
-   *if it is there it will automaticallyfill in the name for you and 
-   highlight the current settings for quantity, minimum level and price per unit.
-   *whatever value you will type into the quantity, minimum level and price pernit fields
-   will increment the current value that is
-   if it dsplays current quantity ----> 20
-   and you type in 23, total quantiy in the database becomes 43 not 23
- */
- 
-
-
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from "react-native";
-import React from "react";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { showMessage} from "react-native-flash-message";
-import { connect } from "react-redux";
-import { addNewProducts } from "../redux/productsListSlice";
-import { logStocking } from "../redux/newScreenLogSlice";
-import { logProduct } from "../redux/productNameSlice";
-import moment from "moment/moment";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Pressable } from "react-native";
+import React, { useState } from "react";
+import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import { showMessage, hideMessage } from "react-native-flash-message";
 import { removeBarcode } from "../redux/currentBarcodeSlice";
+import RadioButtonRN from 'radio-buttons-react-native';
+import WavyHeader from "./wavyHeader";
+import { ScrollView } from "react-native";
+import { useSelector } from "react-redux";
 
-const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
-export const cancel = <MaterialIcons name="cancel" size={20} color={"white"}/>
-export const check = <MaterialIcons name="check-circle" size={20} color={"white"}/>
+const backIcon = <FontAwesome name="chevron-left" size={25} color="#fff"/>
+const barcodeIcon = <MaterialCommunityIcons name="barcode-scan" size={40} />
+const sale = 'sale'
+const overallWidth = Dimensions.get('window').width;
+
+const data = [
+  {
+    label: 'USD'
+   },
+   {
+    label: 'RAND'
+   }, 
+   {
+    label: 'ZWL'
+   }, 
+
+  ];
+
+function IdGen(transact){
+  //generate ids for sales purchases and other transactions.
+  //will be worked on accordingly
+  //first 2 letters for company name id, next letter transact type then transact number
+  switch(transact){
+    case sale:
+      return 'COS001';
+    default:
+      return null
+  }
+}
+function CustomHeader(){
+
+  return (
+    <View style={styles.customHeader}>
+        <Pressable style={{padding: 20}}>
+          {backIcon}
+        </Pressable>
+        <Text style={{color: '#fff', fontSize: 20, fontWeight: '900', padding: 20}}>ReStock</Text>
+    </View>
+  )
+}
+
 
 //inventory app
+export default function AddNewProduct(){
+    const [productName, setProductName] = useSelector(() =>  "");
+    const [category, setCategory] = useSelector(() =>  "");
+    const [supplierName, setSupplierName] = useSelector(() => "");
+    const [quantity, setQuantity] = useSelector(() => "");
+    const [barcode, setBarcode] = useSelector(() => "");
+    const shoppingCart = [];
 
-export const checkFields = (obj, successFunc) => {
-  isComplete = true;
-  Object.values(obj).forEach(function(val){
-    if(val === ""){
-      isComplete = false;
-    }
-  })
-   if(!isComplete){
-    showMessage({
-      message: "  Please complete all fields!",
-      type: "danger",
-      autoHide: true,
-      icon: () => cancel
-    });
-  }else {
-    successFunc(obj);
-  }
-}
-
-export const isInStock = (action, state) => {
-  if(Object.keys(state).length > 0){
-    doesBarcodeExist = (action in state);
-    if(doesBarcodeExist){
-      value = state[action];
-      return value
-    }
-  }
-  return false
-}
-
-
-class AddNewProduct extends React.Component {
-    constructor(props){
-        super(props);
-        this.quantityPlMessage = "Enter quantity"
-        this.minLevelPlMessage = "Enter minimum level"
-        this.pricePlMessage = "Enter Price per unit"
-        this.check = isInStock(this.props.currentBarcode, this.props.inventory)
-
-        this.state = {
-            barcodeNumber: !this.props.currentBarcode? "" : this.props.currentBarcode,
-            productName: !this.check? "": this.check.productName,
-            quantity: "",
-            minLevel: "",
-            pricePerUnit: "",
-            quantityPlaceholder: !this.check? this.quantityPlMessage : `Items in stock ---> ${this.check.quantity}` ,
-            minLevelPlaceholder: !this.check? this.minLevelPlMessage : `Current minimum level ---> ${this.check.minLevel}`,
-            pricePlaceholder: !this.check? this.pricePlMessage: `Current price per unit ----> ${this.check.pricePerUnit}`,
-            instock: false
-        }
-    }
-
-    autofill = (barcode) => {
-      value = isInStock(barcode, this.props.inventory)
-      if(!value){
-        this.setState({
-          productName: "",
-          quantityPlaceholder: this.quantityPlMessage,
-          minLevelPlaceholder: this.minLevelPlMessage,
-          pricePlaceholder: this.pricePlMessage,
-          instock: false
-      })
-      this.setState({instock: value})
-      return null
-      }
-      this.setState({
-        productName: value.productName,
-        quantityPlaceholder: `Items in stock ---> ${value.quantity}`,
-        minLevelPlaceholder: `Current minimum level ---> ${value.minLevel}`,
-        pricePlaceholder: `Current price per unit ----> ${value.pricePerUnit}`,
-        instock: value
-      })
-    } 
-
-    logPrep = () => {
-
-      /*
-        action.payload format
-        "2023-07-14": {
-          "12345":{
-            dateUI: "14th July 2023, 2:41:42 pm",
-            quantity: "10",
-            category: "restock"
-          },
-          "1234567":{ 
-            dateUI: "14th July 2023, 2:41:42 pm",
-            quantity: "2",
-            category: "New Stock"
-          },
-        }
-      */
-      this.props.logStocking({
-        [moment().format()]: {
-          [this.state.barcodeNumber]: {
-            dateUI: moment().format('Do MMMM YYYY, h:mm:ss a'),
-            quantity: this.state.quantity,
-            category: this.state.instock? 'restock': 'New Stock'
-          }
-        }
-      })
-      this.props.logProduct({[this.state.barcodeNumber]: this.state.productName})
-
-    }
-
-    handleConfirm = () => {
-      obj  = {
-        barcodeNumber: this.state.barcodeNumber,
-        productName: this.state.productName,
-        quantity: !this.state.instock? this.state.quantity: `${parseInt(this.state.quantity) + parseInt(this.state.instock.quantity) }`,
-        minLevel: this.state.minLevel,
-        pricePerUnit: this.state.pricePerUnit
-      }
-      checkFields(obj, this.FieldsAreComplete)
-    }
-
-    FieldsAreComplete = (obj) => {
-      currentItem = {};
-      currentItem[this.state.barcodeNumber] = {...obj, dateUI: moment().format('Do MMMM YYYY, h:mm:ss a'), dateCode: moment().format()};
-      this.props.addNewProducts(
-        {...currentItem}
-      )
-
-      this.logPrep()
-      this.props.removeBarcode()
-
-      showMessage({
-        message: "   Saved!",
-        type: "success",
-        autoHide: true,
-        icon: () => check
-      });
-  }
-
-    render(){
+    
         return (
           <View style={styles.Container}>
-                <Pressable 
-                style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
-                onPress={() => this.props.navigation.push("BarcodeScreen", {id: "new Product"})}
-                >
-                  {barcode}
-                </Pressable>
+          <WavyHeader customStyles={styles.svgCurve}/>
+          <CustomHeader />
+          <ScrollView>
                 <View style={styles.main}>
-                  <View style={{width: "100%", display: "flex", alignItems: "center"}}>
+                  <Text style={{fontSize: 25,fontFamily: 'serif', paddingLeft: 10}}>Details</Text>
+
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Category<Text style={{color: "red"}}>*</Text></Text>
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter barcode number"
                           placeholderTextColor="grey"
                           editable={true}
-                          value={this.state.barcodeNumber}
-                          onChangeText={(barcodeNumber) => {
-                            this.setState({ barcodeNumber });
-                            this.autofill(barcodeNumber);
+                          value={category}
+                          autoFocus= { true }
+                          onChangeText={(name) => {
+                            setCategory(name);
+                            //autofill(name);
                           }}
                         />
+                       
+                       <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Product Name<Text style={{color: "red"}}>*</Text></Text>
                        <TextInput
                           style={styles.input}
-                          placeholder="Enter product name"
                           placeholderTextColor={"grey"}
                           editable={true}
-                          value={this.state.productName}
+                          value={productName} 
                           keyboardType={"visible-password"}
-                          onChangeText={(productName) => this.setState({ productName })}
+                          onChangeText={(customer) => setSupplierName(customer)}
                         />
                         
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Barcode<Text style={{color: "red"}}>*</Text></Text>
+                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                          <TextInput
+                            style={{...styles.input, width: "80%"}}
+                            placeholderTextColor={"grey"}
+                            editable={true}
+                            value={barcode}
+                            keyboardType={"visible-password"}
+                            onChangeText={(value) => setBarcode(value)}
+                          />
+                          <Pressable style={{height: '90%', paddingLeft: 10}}>
+                            {barcodeIcon}
+                          </Pressable>
+                        </View>
                         
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Supplier Name<Text style={{color: "red"}}>*</Text></Text>
                         <TextInput
                           style={styles.input}
-                          placeholder={this.state.quantityPlaceholder}
                           placeholderTextColor={"grey"}
-                          editable={true}
-                          value={this.state.quantity}
-                          keyboardType={"numeric"}
-                          onChangeText={(quantity) => this.setState({ quantity })}
+                          editable={false}
+                          value={supplierName}
+                          onChangeText={(customer) => setProductName(customer)}
                         />
+
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Quantity<Text style={{color: "red"}}>*</Text></Text>
                         <TextInput
                           style={styles.input}
-                          placeholder={this.state.minLevelPlaceholder}
-                          placeholderTextColor={"grey"}
-                          editable={true}
-                          value={this.state.minLevel}
+                          placeholderTextColor = {"grey"}
+                          editable={false}
+                          value={''}
                           keyboardType={"numeric"}
-                          onChangeText={(minLevel) => this.setState({ minLevel })}
+                          onChangeText={() => ''}
                         />
-                        <TextInput
-                          style={styles.input}
-                          placeholder={this.state.pricePlaceholder}
-                          placeholderTextColor={"grey"}
-                          editable={true}
-                          value={this.state.pricePerUnit}
-                          keyboardType={"numeric"}
-                          onChangeText={(pricePerUnit) => this.setState({ pricePerUnit })}
-                        />
-                    </View>
-                    <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly"}}>
-                      <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}} onPress={() => this.setState({
-                        barcodeNumber: "",
-                        productName: "",
-                        quantity: "",
-                        minLevel: "",
-                        pricePerUnit: "",
-                        quantityPlaceholder: this.quantityPlMessage,
-                        minLevelPlaceholder: this.minLevelPlMessage,
-                        pricePlaceholder: this.pricePlMessage
-                      })}>
-                          <Text style={{color: "white"}}>Clear</Text>
+
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Purchase price<Text style={{color: "red"}}>*</Text></Text>
+                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                          <TextInput
+                            style={{...styles.input, width: "35%"}}
+                            placeholderTextColor={"grey"}
+                            editable={true}
+                            value={barcode}
+                            keyboardType={"numeric"}
+                            onChangeText={(value) => setBarcode(value)}
+                          />
+                          <RadioButtonRN
+                            data={data}
+                            selectedBtn={(e) => console.log(e)}
+                            style = {{display: 'flex', flexDirection: 'row', width: "25%"}}
+                            icon={
+                              <FontAwesome
+                                name="check-circle"
+                                size={20}
+                                color="#2c9dd1"
+                              />
+                            }
+                            box={false}
+                            textStyle={{paddingLeft: 5}}
+                          />
+                        </View>
+
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Selling Price<Text style={{color: "red"}}>*</Text></Text>
+                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                          <TextInput
+                            style={{...styles.input, width: "35%"}}
+                            placeholderTextColor={"grey"}
+                            editable={true}
+                            value={barcode}
+                            keyboardType={"numeric"}
+                            onChangeText={(value) => setBarcode(value)}
+                          />
+                          <RadioButtonRN
+                            data={data}
+                            selectedBtn={(e) => console.log(e)}
+                            style = {{display: 'flex', flexDirection: 'row', width: "25%"}}
+                            icon={
+                              <FontAwesome
+                                name="check-circle"
+                                size={20}
+                                color="#2c9dd1"
+                              />
+                            }
+                            box={false}
+                            textStyle={{paddingLeft: 5}}
+                          />
+                        </View>
+
+                        <TouchableOpacity style={styles.button}  onPress={() => null}>
+                          <Text style={styles.item}>Save</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity style={styles.button} onPress={() => {
-                        this.handleConfirm()}
-                      }>
-                          <Text style={{color: "white"}}>Confirm</Text>
-                      </TouchableOpacity>
                     </View>
-                </View>
+                </ScrollView>
             </View>
         )
-    }
 }
-const mapStateToProps = state => ({
-  inventory: state.inventoryList.value,
-  currentBarcode: state.currentBCS.value
-})
 
-const mapDispatchToProps = () => ({
-  addNewProducts,
-  logStocking,
-  logProduct,
-  removeBarcode
-})
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps()
-)(AddNewProduct)
 
 const styles = StyleSheet.create({
   Container: {
-      backgroundColor: "#CF8DB9", 
-      height: "100%",
-      display: "flex",
-      justifyContent: "flex-end",
-      alignItems: "center"
+    flex: 1,
+    backgroundColor: '#eeeeee',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  customHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: 100, 
+    width: "100%",
+    // padding: 30,
+    paddingTop: 30,
+    backgroundColor: '#520bb0'
   },
   main: {
-      display: "flex",
-      alignItems: "center",
-      backgroundColor: "#D9D9D9",
-      width: "100%",
-      height: "78%",
-      borderTopRightRadius: 50,
-      borderTopLeftRadius: 50,
-      paddingTop: 70
+    marginTop: 30,
+    backgroundColor: '#fff',
+    color: '#000',
+    width: overallWidth * 0.95,
+    display: 'flex',
+    justifyContent: 'flex-start',
+    padding: 15,
+    shadowColor: "#000",
+    elevation: 6,
+    borderRadius: 5
   },
   input : {
       marginBottom: 30,
-      backgroundColor: "white",
-      width: "70%",
+      width: "95%",
       padding: 10,
-      borderRadius: 20
+      borderRadius: 20,
+      borderBottomColor: 'purple',
+      borderBottomWidth: 1,
+      color: '#000'
   },
   button: {
-      backgroundColor: "#476C6C",
+    backgroundColor: "purple",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: overallWidth * 0.8,
+    height: 45,
+    borderRadius: 30,
+    marginBottom: 40,
+    marginTop: 20,
+    marginLeft: 20
+},
+item: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: 'bold'
+},
+  para: {
       display: "flex",
+      flexDirection: "row",
       alignItems: "center",
-      justifyContent: "center",
-      width: 90,
-      height: 35,
-      borderRadius: 15
-
+      paddingTop: 20
+  },
+  svgCurve: {
+    position: 'absolute',
+    width: Dimensions.get('window').width
   }
 })
+
+

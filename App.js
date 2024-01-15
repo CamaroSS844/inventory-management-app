@@ -15,7 +15,7 @@ import Details from './components/screens/Details';
 import SignInScreen from './components/screens/SignInScreen';
 import AddNewProduct from './components/screens/newProduct';
 import DashboardScreen from './components/screens/Dashboard';
-import ProcessSale from './components/screens/checkOut';
+import Checkout from './components/screens/checkOut';
 import Receipt from './components/screens/Receipt';
 import InventoryTable from './components/screens/viewInventory';
 import RemoveProduct from './components/screens/removeStock';
@@ -40,16 +40,16 @@ function DefaultAppNav(){
   return (
     <Stack.Navigator>
       <Stack.Screen name="Dashboard" component={DashboardScreen} options={{headerShown: false}} />
-      <Stack.Screen name="my details" component={Details} />
-      <Stack.Screen name="new Product" component={AddNewProduct} />
-      <Stack.Screen name="ProcessSale" component={ProcessSale} />
-      <Stack.Screen name="Receipt" component={Receipt} />
-      <Stack.Screen name="InventoryTable" component={InventoryTable} />
-      <Stack.Screen name="remove product" component={RemoveProduct} />
-      <Stack.Screen name="reports" component={Reports} />
-      <Stack.Screen name="prod info" component={InfoScreen} />
-      <Stack.Screen name="BarcodeScreen" component={BarcodeScreen} />
-      <Stack.Screen name="Transfer" component={transferStock} />
+      <Stack.Screen name="my details" component={Details} options={{headerShown: false}} />
+      <Stack.Screen name="new Product" component={AddNewProduct} options={{headerShown: false}} />
+      <Stack.Screen name="Checkout" component={Checkout} options={{headerShown: false}} />
+      <Stack.Screen name="Receipt" component={Receipt} options={{headerShown: false}} />
+      <Stack.Screen name="InventoryTable" component={InventoryTable} options={{headerShown: false}} />
+      <Stack.Screen name="remove product" component={RemoveProduct} options={{headerShown: false}} />
+      <Stack.Screen name="reports" component={Reports} options={{headerShown: false}} />
+      <Stack.Screen name="prod info" component={InfoScreen} options={{headerShown: false}} />
+      <Stack.Screen name="BarcodeScreen" component={BarcodeScreen} options={{headerShown: false}} />
+      <Stack.Screen name="Transfer" component={transferStock} options={{headerShown: false}} />
     </Stack.Navigator>
   )
 }
