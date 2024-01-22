@@ -75,7 +75,7 @@ export default function DashboardScreen(props){
                       </View>
                       <Text>Checkout</Text>
                     </Pressable>
-                    <Pressable style={styles.mainTilebarcode}>
+                    <Pressable style={styles.mainTilebarcode} onPress={() => props.navigation.push('BarcodeScreen', {screenName: "Checkout" } )}>
                       {barcode}
                     </Pressable>
                   </View>
@@ -87,19 +87,19 @@ export default function DashboardScreen(props){
                       </View>
                       <Text>New Stock</Text>
                     </Pressable>
-                    <Pressable style={styles.mainTilebarcode}>
+                    <Pressable style={styles.mainTilebarcode} onPress={() => props.navigation.push('BarcodeScreen', {screenName: "new Product" } )}>
                       {barcode}
                     </Pressable>
                   </View>
 
                   <View style={styles.mainTiles}>
-                    <Pressable style={styles.mainTileIcon}>
+                    <Pressable style={styles.mainTileIcon} onPress={() => props.navigation.push('Transfer')}>
                     <View style={{marginRight: 20, backgroundColor: '#ff005dca', padding: 15, borderRadius: 100}}>
                         {transfer}
                     </View>
                       <Text>transfer Stock</Text>
                     </Pressable>
-                    <Pressable style={styles.mainTilebarcode}>
+                    <Pressable style={styles.mainTilebarcode} onPress={() => props.navigation.push('BarcodeScreen', {screenName: "Transfer" } )}>
                       {barcode}
                     </Pressable>
                   </View>
@@ -111,7 +111,7 @@ export default function DashboardScreen(props){
                     </View>
                       <Text>View Inventory</Text>
                     </Pressable>
-                    <Pressable style={styles.mainTilebarcode}>
+                    <Pressable style={styles.mainTilebarcode} onPress={() => props.navigation.push('BarcodeScreen')}>
                       {barcode}
                     </Pressable>
                   </View>

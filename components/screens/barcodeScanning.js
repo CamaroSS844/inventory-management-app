@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button, Pressable } from 'react-native';
+import { Text, View, StyleSheet, Button, Pressable, Dimensions } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { newBarcode } from '../redux/currentBarcodeSlice';
 import { BarCodeScanner } from 'expo-barcode-scanner'; 
@@ -24,7 +24,7 @@ export default function BarcodeScreen({ navigation, route }) {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     dispatch(newBarcode(data));
-    navigation.replace(route.params.id);
+    navigation.replace(route.params.screenName);
     showMessage({
       message: `Barcode ${data} scanned`,
       description: `You can now add the product to the inventory`,
@@ -41,10 +41,8 @@ export default function BarcodeScreen({ navigation, route }) {
   if (hasPermission === false) {
     return <Text>No access to camera</Text>;
   }
-
   return (
     <View style={styles.container}>
-      <Text>i am reading something</Text>
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
@@ -59,5 +57,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
+    backgroundColor: "#000000cd"
   },
 });

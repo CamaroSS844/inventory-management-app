@@ -39,7 +39,7 @@ function CustomHeader(){
 
 
 //inventory app
-export default function Checkout(){
+export default function Checkout(props){
     const [salesPerson, setSalesPerson] = useSelector(() =>  "");
     const [customerName, setCustomerName] = useSelector(() => "");
     const shoppingCart = [];
@@ -93,7 +93,7 @@ export default function Checkout(){
                     </View>
                 <View style={styles.main}>
                   <Text style={{fontSize: 25,fontFamily: 'serif', paddingLeft: 10}}>Cart</Text>
-                      <TouchableOpacity style={styles.button}  onPress={() => null}>
+                      <TouchableOpacity style={styles.button}  onPress={() => props.navigation.push('checkOutItemScreen')}>
                           <Text style={styles.item}>+ Add Item</Text>
                       </TouchableOpacity>
                        

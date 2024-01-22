@@ -1,295 +1,221 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from "react-native";
-import React from "react";
-import { connect } from "react-redux";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Pressable } from "react-native";
+import React, { useState } from "react";
+import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { showMessage, hideMessage } from "react-native-flash-message";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { remove } from "../redux/productsListSlice";
-import { cancel, check } from "./newProduct";
-import { isInStock, checkFields } from "./newProduct";
-import { logNewRemoval } from "../redux/removalsLogSlice";
-import moment from "moment/moment";
 import { removeBarcode } from "../redux/currentBarcodeSlice";
-import { Pressable } from "react-native";
-import { SelectList } from "react-native-dropdown-select-list";
+import RadioButtonRN from 'radio-buttons-react-native';
+import WavyHeader from "./wavyHeader";
+import { ScrollView } from "react-native";
+import { useSelector } from "react-redux";
 
-const barcode = <MaterialCommunityIcons name="line-scan" size={170} />
+const backIcon = <FontAwesome name="chevron-left" size={25} color="#fff"/>
+const barcodeIcon = <MaterialCommunityIcons name="barcode-scan" size={40} />
+const sale = 'sale'
+const overallWidth = Dimensions.get('window').width;
 
-//sorting according to quantity
-//date of adding inventory
-///date to assist with reordering
-//age analysis
+const data = [
+  {
+    label: 'USD'
+   },
+   {
+    label: 'RAND'
+   }, 
+   {
+    label: 'ZWL'
+   }, 
+
+  ];
+
+function CustomHeader(){
+
+  return (
+    <View style={styles.customHeader}>
+        <Pressable style={{padding: 20}}>
+          {backIcon}
+        </Pressable>
+        <Text style={{color: '#fff', fontSize: 20, fontWeight: '900', padding: 20}}>Transfer</Text>
+    </View>
+  )
+}
 
 
 //inventory app
-class TransferScreen extends React.Component {
-    constructor(props){
-        super(props);
-        this.check = isInStock(this.props.currentBarcode, this.props.inventory)
-        this.branches = this.props.authenticate.Branches;
+export default function TransferScreen(){
+    const [productName, setProductName] = useSelector(() =>  "");
+    const [category, setCategory] = useSelector(() =>  "");
+    const [supplierName, setSupplierName] = useSelector(() => "");
+    const [quantity, setQuantity] = useSelector(() => "");
+    const [barcode, setBarcode] = useSelector(() => "");
+    const shoppingCart = [];
 
-        this.state = {
-            barcodeNumber: !this.props.currentBarcode? "" : this.props.currentBarcode,
-            productName: !this.check? "": this.check.productName,
-            quantity: "",//or all for every thing
-            branch: "",
-            instock: false
-        }
-    }
-
-    autofill = (barcode) => {
-      value = isInStock(barcode, this.props.inventory)
-      if(!value){
-        this.setState({
-          productName: "",
-          instock: false
-      })
-      this.setState({instock: value})
-      return null
-      }
-      this.setState({
-        productName: value.productName,
-        instock: value
-      })
-    }
-
-    logRemovalPrep = () => {
-      /*
-        action.payload format
-        "2023-07-14": {
-          "12345":{
-            dateUI: "14th July 2023, 2:41:42 pm",
-            quantity: "10",
-            category: "damaged",
-            reason: "fell off the shelf"
-          },
-          "1234567":{ 
-            dateUI: "14th July 2023, 2:41:42 pm",
-            quantity: "2",
-            category: "expired",
-            reason: "spent too long in the freezer"
-          },
-        } 
-      */
-      let payload = {};
-      time = moment().format();
-      payload[moment().format()] = {
-        [this.state.barcodeNumber]: {
-          dateUI: moment().format('Do MMMM YYYY, h:mm:ss a'),
-          quantity: this.state.quantity,
-          category: this.state.Category,
-          reason: this.state.Reason
-        }
-      }
-      this.props.logNewRemoval({...payload});
-      this.props.removeBarcode();
-    }
-
-    popUP = (obj) => {
-        Alert.alert(
-          `Are you sure you want to transfer ${this.state.productName} to ${this.state.branch}`,
-          " ",
-          [
-            { text: "Cancel", style: "cancel" },
-            {
-              text: "Confirm",
-              onPress: () => {
-                this.props.remove({
-                  barcode: this.state.barcodeNumber, 
-                  quantity: this.state.quantity,
-                  dateCode: moment().format(),
-                  dateUI: moment().format('Do MMMM YYYY, h:mm:ss a')
-                })
-              
-                this.logRemovalPrep()
-
-                showMessage({
-                  message: `  Saved!`,
-                  type: "success",
-                  autoHide: true,
-                  icon: () => check
-                })
-              },
-            },
-          ]
-        );
-    }
-
-
-    handleConfirm = (obj) => {
-        value = isInStock(this.state.barcodeNumber, this.props.inventory);
-        if (typeof(value) != "object"){
-            showMessage({
-                message: `  Barcode ${this.state.barcodeNumber} does not exist`,
-                description: `  Check for any typos or rescan the barcode`,
-                type: "danger",
-                autoHide: true,
-                duration: 10000,
-                icon: () => cancel
-              });
-        }
-        else{
-            this.popUP(value);
-        }
-    }
-
-    render(){
-        // data: [
-        //     {key:'366', value:'All'},
-        //     {key:'7', value:'1 week'},
-        //     {key:'30', value:'1 month'},
-        //     {key:'90', value:'3 months'},
-        //     {key:'180', value:'6 months'},
-        //     {key:'365', value:'1 year'},
-        // ]
-        data = []
-        for(i=0; i < this.branches.length; i ++){
-            data.push({key: `${i+1}`, value: this.branches[i]})
-        }
-
-
-
+    
         return (
-          <ScrollView >
-            <View style={styles.Container}>
-                <Pressable 
-                  style={{backgroundColor: "white", borderRadius: 20, marginBottom: -60, zIndex: 1}}
-                  onPress={() => this.props.navigation.push("BarcodeScreen", {id : 'Transfer'})}
-                  >
-                  {barcode}
-                </Pressable>
+          <View style={styles.Container}>
+          <WavyHeader customStyles={styles.svgCurve}/>
+          <CustomHeader />
+          <ScrollView>
                 <View style={styles.main}>
-                  <View style={{width: "100%", display: "flex", alignItems: "center"}}>
-                       <TextInput
+                  <Text style={{fontSize: 25,fontFamily: 'serif', paddingLeft: 10}}>Details</Text>
+
+
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Barcode<Text style={{color: "red"}}>*</Text></Text>
+                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                          <TextInput
+                            style={{...styles.input, width: "80%"}}
+                            placeholderTextColor={"grey"}
+                            editable={true}
+                            value={barcode}
+                            keyboardType={"visible-password"}
+                            onChangeText={(value) => setBarcode(value)}
+                          />
+                          <Pressable style={{height: '90%', paddingLeft: 10}}>
+                            {barcodeIcon}
+                          </Pressable>
+                        </View>
+
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Category<Text style={{color: "red"}}>*</Text></Text>
+                        <TextInput
                           style={styles.input}
-                          placeholder="Enter Barcode"
-                          placeholderTextColor={"grey"}
-                          editable={true}
-                          value={this.state.barcodeNumber}
-                          keyboardType={"visible-password"}
-                          onChangeText={(barcodeNumber) => {
-                            this.setState({ barcodeNumber })
-                            this.autofill(barcodeNumber);
+                          placeholderTextColor="grey"
+                          editable={false}
+                          value={category}
+                          autoFocus= { true }
+                          onChangeText={(name) => {
+                            setCategory(name);
+                            //autofill(name);
                           }}
                         />
-                        <TextInput
+                       
+                       <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Product Name<Text style={{color: "red"}}>*</Text></Text>
+                       <TextInput
                           style={styles.input}
-                          placeholder="Product name"
-                          placeholderTextColor={"black"}
+                          placeholderTextColor={"grey"}
                           editable={false}
-                          value={this.state.productName}
+                          value={productName} 
                           keyboardType={"visible-password"}
-                          onChangeText={(productName) => this.setState({ productName })}
+                          onChangeText={(customer) => setSupplierName(customer)}
                         />
                         
+                        
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Branch Name<Text style={{color: "red"}}>*</Text></Text>
                         <TextInput
                           style={styles.input}
-                          placeholder="Enter quantity"
                           placeholderTextColor={"grey"}
-                          editable={true}
-                          value={this.state.quantity}
-                          keyboardType={"numeric"}
-                          onChangeText={(quantity) => this.setState({ quantity })}
+                          value={supplierName}
+                          onChangeText={(customer) => setProductName(customer)}
                         />
 
-                        <View style={{ 
-                            width: '85%', padding: 20,
-                            display: 'flex', justifyContent: 'center', 
-                            alignItems: 'center'}}>
-                            <SelectList 
-                                setSelected={(branch) => this.setState({branch})} 
-                                data={data} 
-                                save="value"
-                                searchPlaceholder="Filter"
-                                boxStyles={styles.input}
-                            />
-                        </View>
-                    </View>
-                    <View style={{display: "flex", flexDirection: "row", width: "100%", justifyContent: "space-evenly", marginBottom: "20%"}}>
-                      <TouchableOpacity style={{...styles.button, backgroundColor: "#bb0606"}} onPress={
-                        () => {
-                            this.setState({
-                                barcodeNumber: "",
-                                productName: "",
-                                quantity: "",
-                            })
-                        }}>
-                          <Text style={{color: "white"}}>Clear</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.button} onPress={() => {
-                        checkFields({...this.state}, this.handleConfirm)
-                        }}>
-                          <Text style={{color: "white"}}>Confirm</Text>
-                      </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-            </ScrollView>
-        )
-    }
-}
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Quantity<Text style={{color: "red"}}>*</Text></Text>
+                        <TextInput
+                          style={styles.input}
+                          placeholderTextColor = {"grey"}
+                          value={''}
+                          keyboardType={"numeric"}
+                          onChangeText={() => ''}
+                        />
 
-const mapStateToProps = state => ({
-    inventory: state.inventoryList.value,
-    currentBarcode: state.currentBCS.value,
-    authenticate: state.accounts.value
-  })
-  
-const mapDispatchToProps = () => ({
-  remove,
-  logNewRemoval,
-  removeBarcode
-})
-  
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps()
-)(TransferScreen)
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Price<Text style={{color: "red"}}>*</Text></Text>
+                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                          <TextInput
+                            style={{...styles.input, width: "35%"}}
+                            placeholderTextColor={"grey"}
+                            placeholder={"**autoset**"}
+                            value={barcode}
+                            keyboardType={"numeric"}
+                            onChangeText={(value) => setBarcode(value)}
+                          />
+                          <RadioButtonRN
+                            data={data}
+                            selectedBtn={(e) => console.log(e)}
+                            style = {{display: 'flex', flexDirection: 'row', width: "25%"}}
+                            icon={
+                              <FontAwesome
+                                name="check-circle"
+                                size={20}
+                                color="#2c9dd1"
+                              />
+                            }
+                            box={false}
+                            textStyle={{paddingLeft: 5}}
+                          />
+                        </View>
+
+                        <TouchableOpacity style={styles.button}  onPress={() => null}>
+                          <Text style={styles.item}>Confirm</Text>
+                      </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </View>
+        )
+}
 
 
 const styles = StyleSheet.create({
   Container: {
-      backgroundColor: "#CF8DB9", 
-      height: "100%",
-      display: "flex",
-      justifyContent: "flex-end",
-      alignItems: "center"
+    flex: 1,
+    backgroundColor: '#eeeeee',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  customHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: 100, 
+    width: "100%",
+    // padding: 30,
+    paddingTop: 30,
+    backgroundColor: '#520bb0'
   },
   main: {
-      display: "flex",
-      alignItems: "center",
-      backgroundColor: "#D9D9D9",
-      width: "100%",
-      height: "80%",
-      borderTopRightRadius: 50,
-      borderTopLeftRadius: 50,
-      paddingTop: 70
+    marginTop: 30,
+    backgroundColor: '#fff',
+    color: '#000',
+    width: overallWidth * 0.95,
+    display: 'flex',
+    justifyContent: 'flex-start',
+    padding: 15,
+    shadowColor: "#000",
+    elevation: 6,
+    borderRadius: 5
   },
   input : {
       marginBottom: 30,
-      backgroundColor: "white",
-      width: "70%",
+      width: "95%",
       padding: 10,
       borderRadius: 20,
-      color: 'black'
+      borderBottomColor: 'purple',
+      borderBottomWidth: 1,
+      color: '#000'
   },
   button: {
-      backgroundColor: "#476C6C",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: 90,
-      height: 35,
-      borderRadius: 15
-
-  },
-  item: {
-      color: "white"
-  },
+    backgroundColor: "purple",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: overallWidth * 0.8,
+    height: 45,
+    borderRadius: 30,
+    marginBottom: 40,
+    marginTop: 20,
+    marginLeft: 20
+},
+item: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: 'bold'
+},
   para: {
       display: "flex",
       flexDirection: "row",
       alignItems: "center",
       paddingTop: 20
+  },
+  svgCurve: {
+    position: 'absolute',
+    width: Dimensions.get('window').width
   }
 })
+
 

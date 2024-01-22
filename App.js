@@ -23,6 +23,7 @@ import InfoScreen from './components/screens/productInfoScreen';
 import Reports from './components/screens/reportLand';
 import BarcodeScreen from './components/screens/barcodeScanning';
 import transferStock from './components/screens/transferStock';
+import CheckoutItemScreen from './components/screens/checkoutItemScreen';
 
 const Stack = createNativeStackNavigator();
 const AuthUserContext = createContext({});
@@ -50,6 +51,7 @@ function DefaultAppNav(){
       <Stack.Screen name="prod info" component={InfoScreen} options={{headerShown: false}} />
       <Stack.Screen name="BarcodeScreen" component={BarcodeScreen} options={{headerShown: false}} />
       <Stack.Screen name="Transfer" component={transferStock} options={{headerShown: false}} />
+      <Stack.Screen name="checkOutItemScreen" component={CheckoutItemScreen} options={{headerShown: false}} />
     </Stack.Navigator>
   )
 }

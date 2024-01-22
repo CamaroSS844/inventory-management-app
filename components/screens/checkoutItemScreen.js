@@ -33,19 +33,20 @@ function CustomHeader(){
         <Pressable style={{padding: 20}}>
           {backIcon}
         </Pressable>
-        <Text style={{color: '#fff', fontSize: 20, fontWeight: '900', padding: 20}}>ReStock</Text>
+        <Text style={{color: '#fff', fontSize: 20, fontWeight: '900', padding: 20}}>Cart</Text>
     </View>
   )
 }
 
 
 //inventory app
-export default function AddNewProduct(){
+export default function CheckoutItemScreen(props){
     const [productName, setProductName] = useSelector(() =>  "");
     const [category, setCategory] = useSelector(() =>  "");
     const [supplierName, setSupplierName] = useSelector(() => "");
     const [quantity, setQuantity] = useSelector(() => "");
     const [barcode, setBarcode] = useSelector(() => "");
+    const shoppingCart = [];
 
     
         return (
@@ -54,9 +55,6 @@ export default function AddNewProduct(){
           <CustomHeader />
           <ScrollView>
                 <View style={styles.main}>
-                  <Text style={{fontSize: 25,fontFamily: 'serif', paddingLeft: 10}}>Details</Text>
-
-
                         <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Barcode<Text style={{color: "red"}}>*</Text></Text>
                         <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                           <TextInput
@@ -67,100 +65,36 @@ export default function AddNewProduct(){
                             keyboardType={"visible-password"}
                             onChangeText={(value) => setBarcode(value)}
                           />
-                          <Pressable style={{height: '90%', paddingLeft: 10}}>
+                          <Pressable style={{height: '90%', paddingLeft: 10}} onPress={() => props.navigation.push('BarcodeScreen', {screenName: "Checkout" })}>
                             {barcodeIcon}
                           </Pressable>
                         </View>
-
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Category<Text style={{color: "red"}}>*</Text></Text>
-                        <TextInput
-                          style={styles.input}
-                          placeholderTextColor="grey"
-                          editable={true}
-                          value={category}
-                          autoFocus= { true }
-                          onChangeText={(name) => {
-                            setCategory(name);
-                            //autofill(name);
-                          }}
-                        />
                        
                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Product Name<Text style={{color: "red"}}>*</Text></Text>
                        <TextInput
                           style={styles.input}
                           placeholderTextColor={"grey"}
-                          editable={true}
+                          editable={false}
                           value={productName} 
                           keyboardType={"visible-password"}
                           onChangeText={(customer) => setSupplierName(customer)}
-                        />
-                        
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Barcode<Text style={{color: "red"}}>*</Text></Text>
-                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                          <TextInput
-                            style={{...styles.input, width: "80%"}}
-                            placeholderTextColor={"grey"}
-                            editable={true}
-                            value={barcode}
-                            keyboardType={"visible-password"}
-                            onChangeText={(value) => setBarcode(value)}
-                          />
-                          <Pressable style={{height: '90%', paddingLeft: 10}}>
-                            {barcodeIcon}
-                          </Pressable>
-                        </View>
-                        
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Supplier Name<Text style={{color: "red"}}>*</Text></Text>
-                        <TextInput
-                          style={styles.input}
-                          placeholderTextColor={"grey"}
-                          editable={false}
-                          value={supplierName}
-                          onChangeText={(customer) => setProductName(customer)}
                         />
 
                         <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Quantity<Text style={{color: "red"}}>*</Text></Text>
                         <TextInput
                           style={styles.input}
                           placeholderTextColor = {"grey"}
-                          editable={false}
                           value={''}
                           keyboardType={"numeric"}
                           onChangeText={() => ''}
                         />
 
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Purchase price<Text style={{color: "red"}}>*</Text></Text>
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Price<Text style={{color: "red"}}>*</Text></Text>
                         <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                           <TextInput
                             style={{...styles.input, width: "35%"}}
                             placeholderTextColor={"grey"}
-                            editable={true}
-                            value={barcode}
-                            keyboardType={"numeric"}
-                            onChangeText={(value) => setBarcode(value)}
-                          />
-                          <RadioButtonRN
-                            data={data}
-                            selectedBtn={(e) => console.log(e)}
-                            style = {{display: 'flex', flexDirection: 'row', width: "25%"}}
-                            icon={
-                              <FontAwesome
-                                name="check-circle"
-                                size={20}
-                                color="#2c9dd1"
-                              />
-                            }
-                            box={false}
-                            textStyle={{paddingLeft: 5}}
-                          />
-                        </View>
-
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Selling Price<Text style={{color: "red"}}>*</Text></Text>
-                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                          <TextInput
-                            style={{...styles.input, width: "35%"}}
-                            placeholderTextColor={"grey"}
-                            editable={true}
+                            placeholder={"**autoset**"}
                             value={barcode}
                             keyboardType={"numeric"}
                             onChangeText={(value) => setBarcode(value)}
@@ -182,7 +116,7 @@ export default function AddNewProduct(){
                         </View>
 
                         <TouchableOpacity style={styles.button}  onPress={() => null}>
-                          <Text style={styles.item}>Save</Text>
+                          <Text style={styles.item}>Confirm</Text>
                       </TouchableOpacity>
                     </View>
                 </ScrollView>
@@ -224,7 +158,7 @@ const styles = StyleSheet.create({
   input : {
       marginBottom: 30,
       width: "95%",
-      padding: 10,
+      padding: 8,
       borderRadius: 20,
       borderBottomColor: 'purple',
       borderBottomWidth: 1,
