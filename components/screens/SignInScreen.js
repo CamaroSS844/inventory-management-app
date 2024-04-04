@@ -3,6 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, Pressable, StyleSheet, Dimensi
 import { showMessage } from "react-native-flash-message";
 import { cancel } from "./newProduct";
 import WavyHeader from "./wavyHeader";
+import { auth } from "../../config/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { Alert } from "react-native";
 
 const overallWidth = Dimensions.get('window').width;
 
@@ -18,7 +21,10 @@ export default function SignIn(props){
         if (email !== "" && password !== ""){
             signInWithEmailAndPassword(auth, email, password)
                 .then(() => console.log("Login success"))
-                .catch((err) => Alert.alert("Login error", err.message))
+                .catch((err) => {
+                    console.log(email, password);
+                    return Alert.alert("Login error", err.message)
+                })
         }
     }
 
@@ -34,22 +40,20 @@ export default function SignIn(props){
                       style={{...styles.input}}
                       placeholder="Enter your email"
                       placeholderTextColor="grey"
-                      editable={true}
                       value={email}
-                      onChangeText={(name) => setEmail({ name })}
+                      onChangeText={(name) => setEmail(name)}
                     />
                     <TextInput
                       style={{...styles.input, marginBottom: 80}}
                       placeholder="Enter your password"
                       placeholderTextColor={"grey"}
-                      editable={true}
                       value={password}
                       secureTextEntry={!passwordVisible}
-                      onChangeText={(password) => setPassword({ password })}
+                      onChangeText={(password) => setPassword(password)}
                     />
             </View>
                 <TouchableOpacity style={styles.button} onPress={() => {
-                    handleLogin()
+                    onHandleLogin()
                     }}>
                     <Text style={styles.item}>Login</Text>
                 </TouchableOpacity>

@@ -41,11 +41,11 @@ function CustomHeader(){
 
 //inventory app
 export default function CheckoutItemScreen(props){
-    const [productName, setProductName] = useSelector(() =>  "");
-    const [category, setCategory] = useSelector(() =>  "");
-    const [supplierName, setSupplierName] = useSelector(() => "");
-    const [quantity, setQuantity] = useSelector(() => "");
-    const [barcode, setBarcode] = useSelector(() => "");
+    const [productName, setProductName] = useState(() =>  "");
+    const [category, setCategory] = useState(() =>  "");
+    const [supplierName, setSupplierName] = useState(() => "");
+    const [quantity, setQuantity] = useState(() => "");
+    const [barcode, setBarcode] = useState(() => "");
     const shoppingCart = [];
 
     

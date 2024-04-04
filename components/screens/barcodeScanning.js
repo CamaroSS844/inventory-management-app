@@ -23,8 +23,7 @@ export default function BarcodeScreen({ navigation, route }) {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    dispatch(newBarcode(data));
-    navigation.replace(route.params.screenName);
+    navigation.replace(route.params.screenName, { barcode: `${data}` });
     showMessage({
       message: `Barcode ${data} scanned`,
       description: `You can now add the product to the inventory`,

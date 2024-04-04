@@ -20,6 +20,7 @@
     "expo-barcode-scanner": "~12.5.3",
     "expo-status-bar": "~1.6.0",
     "firebase": "^10.7.1",
+    "firebase-admin": "^12.0.0",
     "moment": "^2.30.1",
     "prop-types": "^15.8.1",
     "radio-buttons-react-native": "^1.0.4",

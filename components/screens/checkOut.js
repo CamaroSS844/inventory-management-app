@@ -40,8 +40,8 @@ function CustomHeader(){
 
 //inventory app
 export default function Checkout(props){
-    const [salesPerson, setSalesPerson] = useSelector(() =>  "");
-    const [customerName, setCustomerName] = useSelector(() => "");
+    const [salesPerson, setSalesPerson] = useState(() =>  "");
+    const [customerName, setCustomerName] = useState(() => "");
     const shoppingCart = [];
 
     

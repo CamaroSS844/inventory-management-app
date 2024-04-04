@@ -6,7 +6,8 @@ import { removeBarcode } from "../redux/currentBarcodeSlice";
 import RadioButtonRN from 'radio-buttons-react-native';
 import WavyHeader from "./wavyHeader";
 import { ScrollView } from "react-native";
-import { useSelector } from "react-redux";
+import { database } from "../../config/firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 const backIcon = <FontAwesome name="chevron-left" size={25} color="#fff"/>
 const barcodeIcon = <MaterialCommunityIcons name="barcode-scan" size={40} />
@@ -33,21 +34,65 @@ function CustomHeader(){
         <Pressable style={{padding: 20}}>
           {backIcon}
         </Pressable>
-        <Text style={{color: '#fff', fontSize: 20, fontWeight: '900', padding: 20}}>ReStock</Text>
+        <Text style={{color: '#fff', fontSize: 20, fontWeight: '900', padding: 20}}>New Product</Text>
     </View>
   )
 }
 
 
 //inventory app
-export default function AddNewProduct(){
-    const [productName, setProductName] = useSelector(() =>  "");
-    const [category, setCategory] = useSelector(() =>  "");
-    const [supplierName, setSupplierName] = useSelector(() => "");
-    const [quantity, setQuantity] = useSelector(() => "");
-    const [barcode, setBarcode] = useSelector(() => "");
+export default function AddNewProduct(props){
+    const [productName, setProductName] = useState("");
+    const [category, setCategory] = useState("");
+    const [supplierName, setSupplierName] = useState("");
+    const [quantity, setQuantity] = useState("");
+    const [purchasePrice, setPurchasePrice] = useState("");
+    const [sellingPrice, setSellingPrice] = useState("");
+    const [purchaseCurrency, setPurchaseCurrency] = useState("");//might want to let the person decide which currency is their default and then add alternative currencies
+    const [salesCurrency, setSalesCurrency] = useState("");//might want to let the person decide which currency is their default and then add alternative currencies
+    const [barcode, setBarcode] = useState(props.route.params.barcode);
 
+    const checkFields = () => {
+      if (barcode === "" || category === "" || productName === "" || supplierName === "" || quantity === "" || purchasePrice === "" || sellingPrice === "" || purchaseCurrency === "" || salesCurrency === ""){
+        showMessage({
+          message: "Please fill in all fields",
+          description: "All fields are required",
+          type: 'danger',
+          autoHide: true,
+          duration: 5000,
+          icon: () => cancel,
+        });
+      } else {
+        addProduct();
+      }
+    }
+
+    const addProduct = async () => {
+      const docRef = await addDoc(collection(database, "products"), {
+        name: productName,
+        category: category,
+        supplier: supplierName,
+        quantity: quantity,
+        barcode: barcode,
+        PurchasePricePerUnit: purchasePrice,
+        purchaseCurrency: purchaseCurrency,
+        SellingPricePerUnit: sellingPrice,
+        salesCurrency: salesCurrency
+      });
     
+      console.log("Document written with ID: ", docRef.id);
+      if (docRef.id){
+        showMessage({
+          message: "Product added successfully",
+          description: "You can now view the product in the inventory",
+          type: 'success',
+          autoHide: true,
+          duration: 5000,
+          icon: () => check,
+        });
+        props.navigation.replace('new Product', {barcode: ""});
+      }
+    }
         return (
           <View style={styles.Container}>
           <WavyHeader customStyles={styles.svgCurve}/>
@@ -55,6 +100,7 @@ export default function AddNewProduct(){
           <ScrollView>
                 <View style={styles.main}>
                   <Text style={{fontSize: 25,fontFamily: 'serif', paddingLeft: 10}}>Details</Text>
+                    <Text style={{fontFamily: 'serif', color: 'grey'}}>//add popUp for auth and confirm</Text>
 
 
                         <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Barcode<Text style={{color: "red"}}>*</Text></Text>
@@ -62,23 +108,20 @@ export default function AddNewProduct(){
                           <TextInput
                             style={{...styles.input, width: "80%"}}
                             placeholderTextColor={"grey"}
-                            editable={true}
                             value={barcode}
                             keyboardType={"visible-password"}
                             onChangeText={(value) => setBarcode(value)}
                           />
-                          <Pressable style={{height: '90%', paddingLeft: 10}}>
+                          <Pressable style={{height: '90%', paddingLeft: 10}} onPress={() => props.navigation.replace('BarcodeScreen', {screenName: "new Product" } )}>
                             {barcodeIcon}
                           </Pressable>
                         </View>
 
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Category<Text style={{color: "red"}}>*</Text></Text>
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Category<Text style={{color: "red"}}>*</Text> initialise categories</Text>
                         <TextInput
                           style={styles.input}
                           placeholderTextColor="grey"
-                          editable={true}
                           value={category}
-                          autoFocus= { true }
                           onChangeText={(name) => {
                             setCategory(name);
                             //autofill(name);
@@ -89,59 +132,40 @@ export default function AddNewProduct(){
                        <TextInput
                           style={styles.input}
                           placeholderTextColor={"grey"}
-                          editable={true}
                           value={productName} 
                           keyboardType={"visible-password"}
-                          onChangeText={(customer) => setSupplierName(customer)}
+                          onChangeText={(customer) => setProductName(customer)}
                         />
-                        
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Barcode<Text style={{color: "red"}}>*</Text></Text>
-                        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                          <TextInput
-                            style={{...styles.input, width: "80%"}}
-                            placeholderTextColor={"grey"}
-                            editable={true}
-                            value={barcode}
-                            keyboardType={"visible-password"}
-                            onChangeText={(value) => setBarcode(value)}
-                          />
-                          <Pressable style={{height: '90%', paddingLeft: 10}}>
-                            {barcodeIcon}
-                          </Pressable>
-                        </View>
                         
                         <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Supplier Name<Text style={{color: "red"}}>*</Text></Text>
                         <TextInput
                           style={styles.input}
                           placeholderTextColor={"grey"}
-                          editable={false}
                           value={supplierName}
-                          onChangeText={(customer) => setProductName(customer)}
+                          onChangeText={(customer) => setSupplierName(customer)}
                         />
 
                         <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Quantity<Text style={{color: "red"}}>*</Text></Text>
                         <TextInput
                           style={styles.input}
                           placeholderTextColor = {"grey"}
-                          editable={false}
-                          value={''}
+                          value={quantity}
                           keyboardType={"numeric"}
-                          onChangeText={() => ''}
+                          onChangeText={value => setQuantity(value)}
                         />
 
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Purchase price<Text style={{color: "red"}}>*</Text></Text>
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Purchase price/unit<Text style={{color: "red"}}>*</Text></Text>
                         <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                           <TextInput
                             style={{...styles.input, width: "35%"}}
                             placeholderTextColor={"grey"}
-                            editable={true}
-                            value={barcode}
+                            value={purchasePrice}
                             keyboardType={"numeric"}
-                            onChangeText={(value) => setBarcode(value)}
+                            onChangeText={(value) => setPurchasePrice(value)}
                           />
                           <RadioButtonRN
                             data={data}
-                            selectedBtn={(e) => console.log(e)}
+                            selectedBtn={(e) => setPurchaseCurrency(e.label)}
                             style = {{display: 'flex', flexDirection: 'row', width: "25%"}}
                             icon={
                               <FontAwesome
@@ -155,19 +179,18 @@ export default function AddNewProduct(){
                           />
                         </View>
 
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Selling Price<Text style={{color: "red"}}>*</Text></Text>
+                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Selling price/unit<Text style={{color: "red"}}>*</Text></Text>
                         <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                           <TextInput
                             style={{...styles.input, width: "35%"}}
                             placeholderTextColor={"grey"}
-                            editable={true}
-                            value={barcode}
+                            value={sellingPrice}
                             keyboardType={"numeric"}
-                            onChangeText={(value) => setBarcode(value)}
+                            onChangeText={(value) => setSellingPrice(value)}
                           />
                           <RadioButtonRN
                             data={data}
-                            selectedBtn={(e) => console.log(e)}
+                            selectedBtn={(e) => setSalesCurrency(e.label)}
                             style = {{display: 'flex', flexDirection: 'row', width: "25%"}}
                             icon={
                               <FontAwesome
@@ -180,8 +203,7 @@ export default function AddNewProduct(){
                             textStyle={{paddingLeft: 5}}
                           />
                         </View>
-
-                        <TouchableOpacity style={styles.button}  onPress={() => null}>
+                        <TouchableOpacity style={styles.button}  onPress={() => checkFields()}>
                           <Text style={styles.item}>Save</Text>
                       </TouchableOpacity>
                     </View>
@@ -222,7 +244,7 @@ const styles = StyleSheet.create({
     borderRadius: 5
   },
   input : {
-      marginBottom: 30,
+      marginBottom: 25,
       width: "95%",
       padding: 10,
       borderRadius: 20,

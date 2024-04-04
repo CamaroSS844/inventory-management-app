@@ -8,13 +8,26 @@ import {
   Dimensions
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { signOut } from "firebase/auth";
+import { auth } from "../../../../config/firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleRegState } from "../../../redux/compReg";
+import { toggleBSState } from "../../../redux/toggleBSSlice";
 
 const user = <FontAwesome5 name='user-circle' size={70}/>
 
 export default function Content() {
+    let dispatch = useDispatch();
+    let registerState = useSelector( state =>  state.toggleReg.value);
         return (
-                <Pressable style={styles.Container} onPress={() => null}>
-                    <Pressable style={{paddingTop: 20}}>
+                <Pressable style={styles.Container} onPress={() => {
+                    console.log('pressed, closing modal from content')
+                    dispatch(toggleRegState())
+                    }}>
+                    <Pressable style={{paddingTop: 20}} onPress={() => {
+                        dispatch(toggleBSState())
+                        dispatch(toggleRegState())
+                        }}>
                         <Pressable >
                             {user}
                         </Pressable>
@@ -54,7 +67,7 @@ export default function Content() {
                     <Pressable style={{width: '100%', paddingTop: 10,paddingBottom: 10, borderBottomWidth: 1, borderColor: 'lightgrey'}}>
                         <Text style={{fontSize: 15}}>Notification Settings</Text>
                     </Pressable>
-                    <Pressable style={{width: '100%', paddingTop: 10,paddingBottom: 10, borderBottomWidth: 1, borderColor: 'lightgrey'}}>
+                    <Pressable style={{width: '100%', paddingTop: 10,paddingBottom: 10, borderBottomWidth: 1, borderColor: 'lightgrey'}} onPress = {() => signOut(auth)}>
                         <Text style={{fontSize: 15}}>Logout</Text>
                     </Pressable>
                 </View>

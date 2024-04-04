@@ -1,10 +1,11 @@
 import { View, Text, Pressable, StyleSheet, Alert,ScrollView , Dimensions } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { FontAwesome, Ionicons, MaterialIcons, MaterialCommunityIcons} from "@expo/vector-icons";
 import WavyHeader from "./wavyHeader";
 import { toggleBSState } from "../redux/toggleBSSlice";
 import { useDispatch, useSelector } from "react-redux";
 import FontScreen from "./screenComponents/Font/Font";
+import CompanyReg from "./screenComponents/compRegistration";
 
 
 const menu = <Ionicons name="menu" size={30} color='#fff'/>
@@ -41,9 +42,9 @@ function CustomHeader({dispatch}){
 
 //inventory app
 export default function DashboardScreen(props){
-
   const dispatch = useDispatch();
   let bottomShelfState = useSelector( state =>  state.toggleBS.value)
+  let registerState = useSelector( state =>  state.toggleReg.value)
    
         return (
             <View style={styles.container}>
@@ -81,7 +82,7 @@ export default function DashboardScreen(props){
                   </View>
 
                   <View style={styles.mainTiles}>
-                    <Pressable style={styles.mainTileIcon} onPress={() => props.navigation.push('new Product')}>
+                    <Pressable style={styles.mainTileIcon} onPress={() => props.navigation.push('new Product', {barcode: ""})}>
                       <View style={{marginRight: 20, backgroundColor: '#098d7ed1', padding: 15, borderRadius: 50}}>
                         {newStock}
                       </View>
@@ -120,6 +121,10 @@ export default function DashboardScreen(props){
                 {
                   bottomShelfState?
                   <FontScreen />: null
+                }
+                {
+                  registerState?
+                  <CompanyReg />: null
                 }
             </View>
         )
