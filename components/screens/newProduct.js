@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Pressable } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Pressable, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { showMessage, hideMessage } from "react-native-flash-message";
@@ -6,8 +6,9 @@ import { removeBarcode } from "../redux/currentBarcodeSlice";
 import RadioButtonRN from 'radio-buttons-react-native';
 import WavyHeader from "./wavyHeader";
 import { ScrollView } from "react-native";
-import { database } from "../../config/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import {database} from "../../config/firebase";
+import { FieldValue, addDoc, collection, collectionGroup, doc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
+import { useSelector } from "react-redux";
 
 const backIcon = <FontAwesome name="chevron-left" size={25} color="#fff"/>
 const barcodeIcon = <MaterialCommunityIcons name="barcode-scan" size={40} />
@@ -42,18 +43,32 @@ function CustomHeader(){
 
 //inventory app
 export default function AddNewProduct(props){
-    const [productName, setProductName] = useState("");
-    const [category, setCategory] = useState("");
-    const [supplierName, setSupplierName] = useState("");
-    const [quantity, setQuantity] = useState("");
-    const [purchasePrice, setPurchasePrice] = useState("");
-    const [sellingPrice, setSellingPrice] = useState("");
-    const [purchaseCurrency, setPurchaseCurrency] = useState("");//might want to let the person decide which currency is their default and then add alternative currencies
-    const [salesCurrency, setSalesCurrency] = useState("");//might want to let the person decide which currency is their default and then add alternative currencies
+    const [productName, setProductName] = useState("Counter books");
+    const [loading, setLoading] = useState(false);
+    const [category, setCategory] = useState("Stationary");
+    const [supplierName, setSupplierName] = useState("Merlin");
+    const [quantity, setQuantity] = useState("70");
+    const [purchasePrice, setPurchasePrice] = useState("2");
+    const [sellingPrice, setSellingPrice] = useState("4");
+    const [purchaseCurrency, setPurchaseCurrency] = useState("RAND");//might want to let the person decide which currency is their default and then add alternative currencies
+    const [salesCurrency, setSalesCurrency] = useState("RAND");//might want to let the person decide which currency is their default and then add alternative currencies
     const [barcode, setBarcode] = useState(props.route.params.barcode);
 
+    let stock = useSelector(state => state.inventoryList.value);
+
+    const checkProduct = (value) => {
+      if (stock[value]){
+        setCategory(stock[value].category);
+        setProductName(stock[value].product_name);
+        setSellingPrice(stock[value].SellingPriceUnit);
+        setPurchasePrice(stock[value].PurchasePriceunit);
+      }
+    }
+
     const checkFields = () => {
+      setLoading(true);
       if (barcode === "" || category === "" || productName === "" || supplierName === "" || quantity === "" || purchasePrice === "" || sellingPrice === "" || purchaseCurrency === "" || salesCurrency === ""){
+        setLoading(false);
         showMessage({
           message: "Please fill in all fields",
           description: "All fields are required",
@@ -68,31 +83,61 @@ export default function AddNewProduct(props){
     }
 
     const addProduct = async () => {
-      const docRef = await addDoc(collection(database, "products"), {
-        name: productName,
+      const time = new Date().toString();
+
+      const purchasesPayload = {
+        product_name: productName,
         category: category,
         supplier: supplierName,
         quantity: quantity,
         barcode: barcode,
-        PurchasePricePerUnit: purchasePrice,
+        PurchasePriceunit: purchasePrice,
         purchaseCurrency: purchaseCurrency,
-        SellingPricePerUnit: sellingPrice,
-        salesCurrency: salesCurrency
-      });
-    
-      console.log("Document written with ID: ", docRef.id);
-      if (docRef.id){
-        showMessage({
-          message: "Product added successfully",
-          description: "You can now view the product in the inventory",
-          type: 'success',
-          autoHide: true,
-          duration: 5000,
-          icon: () => check,
+        received_at: time
+      };
+      const stockPayload = {
+        product_name: productName,
+        quantity: quantity,
+        barcode: barcode,
+        SellingPriceUnit: sellingPrice,
+        salesCurrency: salesCurrency,
+        received_at: time
+      }; 
+
+
+    const batch = writeBatch(database); 
+
+    const purchase = doc(database, `CompaniesList/list/Brainbox/Purchases`);
+    batch.update(purchase, {[time]: purchasesPayload});
+
+    const stock = doc(database, "CompaniesList/list/Brainbox/Stock");
+    batch.update(stock, {[barcode]: stockPayload});
+
+
+    try {
+        await batch.commit().then(() => {
+            setLoading(false);
+            console.log("Batch write successful");
+            showMessage({
+              message: "Product added successfully",
+              description: "You can now view the product in the inventory",
+              type: 'success',
+              autoHide: true,
+              duration: 5000,
+              icon: () => check,
+            });
+            props.navigation.replace('new Product', {barcode: ""});
         });
-        props.navigation.replace('new Product', {barcode: ""});
       }
+       catch (e) {
+          setLoading(false);
+          console.log(e);
+      }
+    
     }
+
+
+
         return (
           <View style={styles.Container}>
           <WavyHeader customStyles={styles.svgCurve}/>
@@ -110,7 +155,7 @@ export default function AddNewProduct(props){
                             placeholderTextColor={"grey"}
                             value={barcode}
                             keyboardType={"visible-password"}
-                            onChangeText={(value) => setBarcode(value)}
+                            onChangeText={(value) => checkProduct(value)}
                           />
                           <Pressable style={{height: '90%', paddingLeft: 10}} onPress={() => props.navigation.replace('BarcodeScreen', {screenName: "new Product" } )}>
                             {barcodeIcon}
@@ -208,6 +253,13 @@ export default function AddNewProduct(props){
                       </TouchableOpacity>
                     </View>
                 </ScrollView>
+                {
+                loading?
+                  <View style={styles.loader}>
+                    <ActivityIndicator animating={loading} size="large" color="purple"/>
+                  </View>
+                : null
+                }
             </View>
         )
 }
@@ -241,7 +293,7 @@ const styles = StyleSheet.create({
     padding: 15,
     shadowColor: "#000",
     elevation: 6,
-    borderRadius: 5
+    borderRadius: 5,
   },
   input : {
       marginBottom: 25,
@@ -278,6 +330,16 @@ item: {
   svgCurve: {
     position: 'absolute',
     width: Dimensions.get('window').width
+  },
+  loader: {
+    position: "absolute", 
+    height: "100%", 
+    width: "100%", 
+    backgroundColor: "#00000047", 
+    zIndex: 2,
+    display: 'flex',
+    justifyContent: 'center',
+    alignContent: 'center'
   }
 })
 

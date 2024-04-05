@@ -138,8 +138,8 @@ export const productsSlice = createSlice({
     name: 'inventoryList',
     initialState,
     reducers: {
-        addNewProducts: (state = {}, action) => {
-            state.value = addToInventory(state.value, action.payload);
+        currentStock: (state = {}, action) => {
+            state.value = action.payload;
         },
         remove: (state= {}, action) => {
           barcode = `${action.payload.barcode}`;
@@ -160,7 +160,7 @@ export const productsSlice = createSlice({
 })
 
 
-export const { addNewProducts ,clearAll, remove, bulkRemove } = productsSlice.actions
+export const { currentStock ,clearAll, remove, bulkRemove } = productsSlice.actions
 
 export default productsSlice.reducer
 

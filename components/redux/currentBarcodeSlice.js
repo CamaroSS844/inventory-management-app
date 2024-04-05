@@ -8,7 +8,9 @@ second account
 
 
 const initialState = {
-    value: '3935762003631'
+    barcode: "",
+    productName: "",
+    price: "",
   }
 
 
@@ -16,24 +18,21 @@ export const currentBCSlice= createSlice({
     name: 'currentBCS',
     initialState,
     reducers: {
-        newBarcode: (state = {}, action) => {
+        currentItem: (state = {}, action) => {
             /*
             action.payload format
-            '1234567890'
+            {
+                barcode: "",
+                productName: "",
+                price: ""
+            }
             */
             state.value = action.payload;
-        },
-        removeBarcode: (state = {}) => {
-            /**
-             * action.payload format
-             * "Fernandez Torres"
-             */
-            state.value = false
         }
     }
 })
 
 
-export const { newBarcode, removeBarcode } = currentBCSlice.actions
+export const { currentItem } = currentBCSlice.actions
 export default currentBCSlice.reducer
 

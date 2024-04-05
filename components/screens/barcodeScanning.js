@@ -9,6 +9,7 @@ import { check } from './newProduct';
 export default function BarcodeScreen({ navigation, route }) {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  let stock = useSelector(state => state.inventoryList.value);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -23,15 +24,14 @@ export default function BarcodeScreen({ navigation, route }) {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    navigation.replace(route.params.screenName, { barcode: `${data}` });
-    showMessage({
-      message: `Barcode ${data} scanned`,
-      description: `You can now add the product to the inventory`,
-      type: 'success',
-      autoHide: true,
-      duration: 5000,
-      icon: () => check,
-    });
+    if(data in stock){
+      navigation.replace(route.params.screenName, { 
+        barcode: `${data}`, 
+        productName: `${stock[data].product_name}`, 
+        price: `${stock[data].SellingPriceUnit}`,
+        activate: true
+      });
+    }
   };
 
   if (hasPermission === null) {

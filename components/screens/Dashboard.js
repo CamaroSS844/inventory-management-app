@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet, Alert,ScrollView , Dimensions } from "react-native";
+import { View, Text, Pressable, StyleSheet, Alert,ScrollView , Dimensions, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import { FontAwesome, Ionicons, MaterialIcons, MaterialCommunityIcons} from "@expo/vector-icons";
 import WavyHeader from "./wavyHeader";
@@ -6,6 +6,9 @@ import { toggleBSState } from "../redux/toggleBSSlice";
 import { useDispatch, useSelector } from "react-redux";
 import FontScreen from "./screenComponents/Font/Font";
 import CompanyReg from "./screenComponents/compRegistration";
+import { database } from "../../config/firebase";
+import { FieldValue, addDoc, collection, collectionGroup, doc, setDoc, updateDoc, writeBatch, getDoc } from "firebase/firestore";
+import { currentStock } from "../redux/productsListSlice";
 
 
 const menu = <Ionicons name="menu" size={30} color='#fff'/>
@@ -43,8 +46,35 @@ function CustomHeader({dispatch}){
 //inventory app
 export default function DashboardScreen(props){
   const dispatch = useDispatch();
-  let bottomShelfState = useSelector( state =>  state.toggleBS.value)
-  let registerState = useSelector( state =>  state.toggleReg.value)
+  let bottomShelfState = useSelector( state =>  state.toggleBS.value);
+  let registerState = useSelector( state =>  state.toggleReg.value);
+  const [loading, setLoading] = useState(false);
+
+
+  const getStock = async (destination) => {
+    setLoading(true);
+    const stockRef = doc(database, "CompaniesList/list/Brainbox/Stock")
+    const stockSnapshot = await getDoc(stockRef).then((doc) => {
+      if (doc.exists()) {
+        setLoading(false);
+        dispatch(currentStock(doc.data()));
+        if (Object.keys(doc.data()).length == 0 && destination != "new Product") {
+          Alert.alert("No stock available");
+          return;
+        } else {
+          props.navigation.push(destination, {barcode: "", productName: "", price: "", activate: false});
+        }
+      } else {
+        // doc.data() will be undefined in this case
+        setLoading(false);
+        Alert.alert("No such document in the database");
+      }
+    }).catch((error) => {
+      setLoading(false);
+      Alert.alert("Error getting document: check console");
+      console.log("Error getting document:", error);
+    });
+  }
    
         return (
             <View style={styles.container}>
@@ -70,7 +100,7 @@ export default function DashboardScreen(props){
                 <ScrollView>{/*this is the item containing all the dashboard tiles*/}
                   <View style={{...styles.mainTiles, marginTop: 50}}>
 
-                    <Pressable style={styles.mainTileIcon} onPress={() => props.navigation.push('Checkout')}>
+                    <Pressable style={styles.mainTileIcon} onPress={() => getStock("Checkout")}>
                       <View style={{marginRight: 20, backgroundColor: '#ffbb00c2', padding: 15, borderRadius: 50}}>
                         {checkout}
                       </View>
@@ -82,7 +112,7 @@ export default function DashboardScreen(props){
                   </View>
 
                   <View style={styles.mainTiles}>
-                    <Pressable style={styles.mainTileIcon} onPress={() => props.navigation.push('new Product', {barcode: ""})}>
+                    <Pressable style={styles.mainTileIcon} onPress={() => getStock('new Product')}>
                       <View style={{marginRight: 20, backgroundColor: '#098d7ed1', padding: 15, borderRadius: 50}}>
                         {newStock}
                       </View>
@@ -94,7 +124,7 @@ export default function DashboardScreen(props){
                   </View>
 
                   <View style={styles.mainTiles}>
-                    <Pressable style={styles.mainTileIcon} onPress={() => props.navigation.push('Transfer')}>
+                    <Pressable style={styles.mainTileIcon} onPress={() => getStock('Transfer')}>
                     <View style={{marginRight: 20, backgroundColor: '#ff005dca', padding: 15, borderRadius: 100}}>
                         {transfer}
                     </View>
@@ -106,7 +136,7 @@ export default function DashboardScreen(props){
                   </View>
                   
                   <View style={styles.mainTiles}>
-                    <Pressable style={styles.mainTileIcon}>
+                    <Pressable style={styles.mainTileIcon} onPress = {() => getStock("Transfer")}>
                     <View style={{marginRight: 20, backgroundColor: '#9696cd', padding: 15, borderRadius: 50}}>
                         {viewInventory}
                     </View>
@@ -125,6 +155,13 @@ export default function DashboardScreen(props){
                 {
                   registerState?
                   <CompanyReg />: null
+                }
+                {
+                loading?
+                  <View style={styles.loader}>
+                    <ActivityIndicator animating={loading} size="large" color="purple"/>
+                  </View>
+                : null
                 }
             </View>
         )
@@ -217,6 +254,16 @@ const styles = StyleSheet.create({
         paddingRight: 30, 
         borderLeftWidth: 1, 
         borderColor: 'lightgrey'
+      },
+      loader: {
+        position: "absolute", 
+        height: "100%", 
+        width: "100%", 
+        backgroundColor: "#00000047", 
+        zIndex: 2,
+        display: 'flex',
+        justifyContent: 'center',
+        alignContent: 'center'
       }
 })
 

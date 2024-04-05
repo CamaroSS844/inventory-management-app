@@ -47,12 +47,15 @@ export default function CompanyReg(){
             batch.update(companyListDoc, {[newCompany]: true});
 
             try {
-                await batch.commit();
-            } catch (e) {
+                await batch.commit().then(() => {
+                    console.log("Batch write successful");
+                    Alert.alert("Registration successful");
+                });
+            }
+             catch (e) {
                 console.log(e);
             }
 
-            Alert.alert("Registration successful");
         }
     }
 

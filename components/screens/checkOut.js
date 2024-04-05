@@ -93,7 +93,7 @@ export default function Checkout(props){
                     </View>
                 <View style={styles.main}>
                   <Text style={{fontSize: 25,fontFamily: 'serif', paddingLeft: 10}}>Cart</Text>
-                      <TouchableOpacity style={styles.button}  onPress={() => props.navigation.push('checkOutItemScreen')}>
+                      <TouchableOpacity style={styles.button}  onPress={() => props.navigation.push('checkOutItemScreen', {barcode: "", productName: "", price: "", activate: false})}>
                           <Text style={styles.item}>+ Add Item</Text>
                       </TouchableOpacity>
                        
