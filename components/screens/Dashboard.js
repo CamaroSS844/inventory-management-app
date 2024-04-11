@@ -61,7 +61,10 @@ export default function DashboardScreen(props){
         if (Object.keys(doc.data()).length == 0 && destination != "new Product") {
           Alert.alert("No stock available");
           return;
-        } else {
+        } else if(destination == "Checkout"){
+          props.navigation.push(destination, {cart: {}});
+        }
+        else {
           props.navigation.push(destination, {barcode: "", productName: "", price: "", activate: false});
         }
       } else {

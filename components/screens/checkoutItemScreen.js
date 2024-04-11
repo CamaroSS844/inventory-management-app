@@ -47,14 +47,23 @@ export default function CheckoutItemScreen(props){
     const [qField, setQField] = useState(props.route.params.activate);
     const [barcode, setBarcode] = useState(props.route.params.barcode);
     const [loading, setLoading] = useState(false);
-    const [cart, setCart] = useState({});
+    const [cart, setCart] = useState(props.route.params.cart);
+    console.log(`checkoutitemscreen`);
+    console.log(cart);
     
     let stock = useSelector(state => state.inventoryList.value);
     
+    const reset = () => {
+      setProductName("");
+      setPrice("");
+      setQuantity("");
+      setQField(false);
+      setBarcode("");
+    }
 
     const check = (barcode) => {
       setBarcode(barcode)
-      if (barcode in stock){
+      if (barcode in stock){ 
         setQField(true);
         setProductName(stock[barcode].product_name);
         setPrice(stock[barcode].SellingPriceUnit);
@@ -68,7 +77,7 @@ export default function CheckoutItemScreen(props){
 
     const confirmEntry = () => {
       if(barcode in stock && quantity != "" && quantity > 0){
-        remainingStock = parseFloat(stock[barcode].quantity) - quantity;
+        remainingStock = parseFloat(stock[barcode].quantity) - parseFloat(quantity);
         if(remainingStock < 0){
           showMessage({
             message: "Insufficient stock",
@@ -76,19 +85,30 @@ export default function CheckoutItemScreen(props){
           });
           return;
         } else {
-          setCart({...cart, 
+           setCart({...cart, 
             [barcode]: {
               product_name: productName, 
               price: price, 
               quantity: quantity
             }});
-          showMessage({
-            message: "Added to cart",
-            type: "success",
-          });
+            console.log(cart);
+            reset();
           return;
         }
       }
+    }
+
+    const completeEntry = () => {
+      if (barcode in stock && quantity != "" && quantity > 0){
+        props.navigation.push('Checkout', {cart: {...cart, [barcode]: {
+          product_name: productName, 
+          price: price, 
+          quantity: quantity 
+        }}});
+      }else if (Object.keys(cart).length > 0 ){
+        props.navigation.replace('Checkout', {cart: cart});
+      }
+      
     }
     
         return (
@@ -107,9 +127,9 @@ export default function CheckoutItemScreen(props){
                             keyboardType={"visible-password"}
                             onChangeText={(value) => check(value)}
                           />
-                          <Pressable style={{height: '90%', paddingLeft: 10}} onPress={() => props.navigation.push('BarcodeScreen', {screenName: "checkOutItemScreen" })}>
+                          <Pressable style={{height: '90%', paddingLeft: 10}} onPress={() => props.navigation.push('BarcodeScreen', {screenName: "checkOutItemScreen", cart: cart })}>
                             {barcodeIcon}
-                          </Pressable>
+                          </Pressable>  
                         </View>
                        
                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Product Name<Text style={{color: "red"}}>*</Text></Text>
@@ -126,7 +146,7 @@ export default function CheckoutItemScreen(props){
                         <TextInput
                           style={styles.input}
                           placeholderTextColor = {"grey"}
-                          value={''}
+                          value={quantity}
                           editable={qField}
                           keyboardType={"numeric"}
                           onChangeText={value => setQuantity(value)}
@@ -158,10 +178,18 @@ export default function CheckoutItemScreen(props){
                             textStyle={{paddingLeft: 5}}
                           />
                         </View>
-
-                        <TouchableOpacity style={styles.button}  onPress={() => confirmEntry()}>
-                          <Text style={styles.item}>Confirm</Text>
-                      </TouchableOpacity>
+                            
+                        <View style={styles.para}> 
+                          <TouchableOpacity style={{...styles.button, marginLeft: "auto", marginRight: "auto"}}  onPress={() => completeEntry()}>
+                            <Text style={styles.item}>Done</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity style={{...styles.button, marginLeft: "auto", marginRight: "auto"}}  onPress={() => confirmEntry()}>
+                            <Text style={styles.item}>Next</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity style={{...styles.button, backgroundColor: "#C33737", marginLeft: "auto", marginRight: "auto"}}  onPress={() => reset()}>
+                            <Text style={styles.item}>clear</Text>
+                          </TouchableOpacity>
                     </View>
                 </ScrollView>
                 {
@@ -216,26 +244,27 @@ const styles = StyleSheet.create({
       color: '#000'
   },
   button: {
-    backgroundColor: "purple",
+    backgroundColor: "#25837E",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: overallWidth * 0.8,
-    height: 45,
-    borderRadius: 30,
-    marginBottom: 40,
-    marginTop: 20,
+    width: overallWidth * 0.25,
+    height: 40,
+    borderRadius: 12,
+    marginBottom: 30,
+    marginTop: 10,
     marginLeft: 20
 },
 item: {
     color: "white",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold'
 },
   para: {
       display: "flex",
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
       paddingTop: 20
   },
   svgCurve: {

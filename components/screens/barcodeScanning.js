@@ -11,6 +11,7 @@ export default function BarcodeScreen({ navigation, route }) {
   const [scanned, setScanned] = useState(false);
   let stock = useSelector(state => state.inventoryList.value);
   const dispatch = useDispatch();
+  console.log(route.params.cart);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -25,10 +26,27 @@ export default function BarcodeScreen({ navigation, route }) {
     setScanned(true);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
     if(data in stock){
+      if ( route.params.screenName === 'checkOutItemScreen' ){
       navigation.replace(route.params.screenName, { 
-        barcode: `${data}`, 
-        productName: `${stock[data].product_name}`, 
+        barcode: `${data}`,
+        productName: `${stock[data].product_name}`,
         price: `${stock[data].SellingPriceUnit}`,
+        activate: true,
+        cart: route.params.cart
+      });
+    } else {
+      navigation.replace(route.params.screenName, { 
+        barcode: `${data}`,
+        productName: `${stock[data].product_name}`,
+        price: `${stock[data].SellingPriceUnit}`,
+        activate: true
+      });
+    }
+    }else {
+      navigation.replace(route.params.screenName, { 
+        barcode: `${data}`,
+        productName: ``,
+        price: ``,
         activate: true
       });
     }
