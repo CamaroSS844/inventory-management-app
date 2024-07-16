@@ -20,3 +20,10 @@ the data base keeps a list of companies.
     6. purchases returns
     7. transfers
     8. activity log doc
+products
+    1. all products are stored in a category
+    2. all we need to know in a category is the product name,its amount and selling price
+    3. products are identified using barcodes
+
+current line of thought
+    improving the add stock nton nton by retrieving data eachtime some onoe clicks on the new stock what what so that we have a local storage of the updated database allowing us to have features such as the auto commplete that we had initially

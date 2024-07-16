@@ -1,14 +1,14 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Pressable, ActivityIndicator, Alert } from "react-native";
 import React, { useState } from "react";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { showMessage, hideMessage } from "react-native-flash-message";
-import { removeBarcode } from "../redux/currentBarcodeSlice";
 import RadioButtonRN from 'radio-buttons-react-native';
 import WavyHeader from "./wavyHeader";
 import { ScrollView } from "react-native";
 import {database} from "../../config/firebase";
 import { FieldValue, addDoc, collection, collectionGroup, doc, setDoc, updateDoc, writeBatch } from "firebase/firestore";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { currentStock } from "../redux/productsListSlice";
 
 const backIcon = <FontAwesome name="chevron-left" size={25} color="#fff"/>
 const barcodeIcon = <MaterialCommunityIcons name="barcode-scan" size={40} />
@@ -43,31 +43,47 @@ function CustomHeader(){
 
 //inventory app
 export default function AddNewProduct(props){
-    const [productName, setProductName] = useState("Counter books");
+    const [productName, setProductName] = useState(props.route.params.productName);
     const [loading, setLoading] = useState(false);
-    const [category, setCategory] = useState("Stationary");
-    const [supplierName, setSupplierName] = useState("Merlin");
-    const [quantity, setQuantity] = useState("70");
-    const [purchasePrice, setPurchasePrice] = useState("2");
-    const [sellingPrice, setSellingPrice] = useState("4");
+    const [supplierName, setSupplierName] = useState("");
+    const [quantity, setQuantity] = useState("");
+    const [purchasePrice, setPurchasePrice] = useState("");
+    const [sellingPrice, setSellingPrice] = useState(props.route.params.price);
     const [purchaseCurrency, setPurchaseCurrency] = useState("RAND");//might want to let the person decide which currency is their default and then add alternative currencies
     const [salesCurrency, setSalesCurrency] = useState("RAND");//might want to let the person decide which currency is their default and then add alternative currencies
     const [barcode, setBarcode] = useState(props.route.params.barcode);
+    let dispatch = useDispatch();
 
     let stock = useSelector(state => state.inventoryList.value);
+    
+    console.log(`product redux ${JSON.stringify(stock)}`);
+
+    const [currentAmount, setCurrentAmount] = useState(stock[barcode] ? stock[barcode].quantity : 0);
+
+    if (stock[barcode]){
+      console.log(`stock: ${JSON.stringify(stock[barcode].quantity)}`);
+    }
+
 
     const checkProduct = (value) => {
+      setBarcode(value);
       if (stock[value]){
-        setCategory(stock[value].category);
         setProductName(stock[value].product_name);
         setSellingPrice(stock[value].SellingPriceUnit);
         setPurchasePrice(stock[value].PurchasePriceunit);
+        setCurrentAmount(parseFloat(stock[value].quantity));
+      } else {
+        setProductName("");
+        setSellingPrice("");
+        setPurchasePrice("");
+        setSupplierName("");
+        setQuantity(0);
       }
     }
 
     const checkFields = () => {
       setLoading(true);
-      if (barcode === "" || category === "" || productName === "" || supplierName === "" || quantity === "" || purchasePrice === "" || sellingPrice === "" || purchaseCurrency === "" || salesCurrency === ""){
+      if (barcode === "" || productName === "" || supplierName === "" || quantity === "" || purchasePrice === "" || sellingPrice === "" || purchaseCurrency === "" || salesCurrency === ""){
         setLoading(false);
         showMessage({
           message: "Please fill in all fields",
@@ -77,7 +93,21 @@ export default function AddNewProduct(props){
           duration: 5000,
           icon: () => cancel,
         });
-      } else {
+      } else if (barcode in stock && stock[barcode].product_name != productName ){
+        setLoading(false);
+        Alert.alert(
+          "Product name mismatch",
+          `The barcode ${barcode} already exists in the inventory as ${stock[barcode].product_name}. Do you want to update the product name to ${productName}?`,
+          [
+            {
+              text: "No",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel"
+            },
+            { text: "Yes", onPress: () => addProduct() }
+          ]
+        );
+      }else {
         addProduct();
       }
     }
@@ -87,17 +117,17 @@ export default function AddNewProduct(props){
 
       const purchasesPayload = {
         product_name: productName,
-        category: category,
         supplier: supplierName,
-        quantity: quantity,
+        quantity: parseFloat(quantity),
         barcode: barcode,
         PurchasePriceunit: purchasePrice,
         purchaseCurrency: purchaseCurrency,
         received_at: time
       };
+      console.log(`current amount: ${currentAmount}`)
       const stockPayload = {
         product_name: productName,
-        quantity: quantity,
+        quantity: (parseFloat(quantity) + currentAmount),
         barcode: barcode,
         SellingPriceUnit: sellingPrice,
         salesCurrency: salesCurrency,
@@ -116,17 +146,11 @@ export default function AddNewProduct(props){
 
     try {
         await batch.commit().then(() => {
-            setLoading(false);
-            console.log("Batch write successful");
-            showMessage({
-              message: "Product added successfully",
-              description: "You can now view the product in the inventory",
-              type: 'success',
-              autoHide: true,
-              duration: 5000,
-              icon: () => check,
-            });
-            props.navigation.replace('new Product', {barcode: ""});
+            dispatch(currentStock(stockPayload));
+        }).then(() => {
+          setLoading(false);
+          console.log("Batch write successful");
+          props.navigation.replace('new Product', {barcode: ""});
         });
       }
        catch (e) {
@@ -161,17 +185,6 @@ export default function AddNewProduct(props){
                             {barcodeIcon}
                           </Pressable>
                         </View>
-
-                        <Text style={{fontFamily: 'serif', paddingLeft: 10, paddingTop: 10}}>Category<Text style={{color: "red"}}>*</Text> initialise categories</Text>
-                        <TextInput
-                          style={styles.input}
-                          placeholderTextColor="grey"
-                          value={category}
-                          onChangeText={(name) => {
-                            setCategory(name);
-                            //autofill(name);
-                          }}
-                        />
                        
                        <Text style={{fontFamily: 'serif', paddingLeft: 10}}>Product Name<Text style={{color: "red"}}>*</Text></Text>
                        <TextInput

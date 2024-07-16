@@ -1,8 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Pressable} from "react-native";
 import React, { useState } from "react";
 import { FontAwesome, Feather } from "@expo/vector-icons";
-import { useDispatch, useSelector } from "react-redux";
-import { remove } from "../redux/productsListSlice";
 import WavyHeader from "./wavyHeader";
 import { ScrollView } from "react-native";
 import { FloatingAction } from "react-native-floating-action";
